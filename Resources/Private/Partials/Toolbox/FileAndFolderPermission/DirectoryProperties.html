@@ -1,0 +1,11 @@
+<f:if condition="{directory}">
+	<f:then>
+		perm: <b>{directory.permissions}</b> /
+		group: <b>{directory.groupId}</b> /
+		owner: <b>{directory.ownerId}</b>
+	</f:then>
+	<f:else>
+		No directory properties.
+	</f:else>
+	
+</f:if>

@@ -1,0 +1,72 @@
+<f:layout name="Default"/>
+
+<f:section name="content">
+	<h2>File and folder permissions</h2>
+	<f:flashMessages/>
+	<h3>Action</h3>
+	<h4>Current selection:</h4>
+	<p>
+		<f:if condition="{data.path.current.selected}">
+			<f:then>
+				<f:form>
+					<div class="form-group">
+						<b>Path:</b>
+						{data.path.site}<b>{data.path.current.selected}</b>
+						<br/>
+						<b>Properties:</b>
+						<f:render partial="Toolbox/FileAndFolderPermission/DirectoryProperties"
+							arguments="{directory:data.path.current.properties}"/>
+						<br/>
+						<div class="input-group">
+							<f:form.hidden
+									class="form-control"
+									id="data_form_pathSelected"
+									name="data[form][pathSelected]"
+									value="{data.path.current.selected}"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<h4>Fix permissions:</h4>
+						<div class="checkbox-inline">
+							<label>
+								<f:form.checkbox
+										id="data_form_action_fixpermissions"
+										name="data[form][action][fixpermissions]"
+										value="1"/>
+								By default (
+									files: {data.targetPermissions.fileCreateMask},
+									folders: {data.targetPermissions.folderCreateMask}
+								)
+							</label>
+						</div>
+						<br/>
+						<div class="checkbox-inline">
+							<label>
+								<f:form.checkbox
+										id="data_form_action_fixpermissions_recursive"
+										name="data[form][action][fixpermissions_recursive]"
+										value="1"/>
+								Recursively
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<button type="submit" class="btn btn-danger" data-dismiss="modal">Submit</button>
+					</div>
+				</f:form>
+			</f:then>
+			<f:else>
+				<p>
+					<b>Path:</b> {data.path.site}
+				</p>
+				<p>
+					Select a folder
+				</p>
+			</f:else>
+		</f:if>
+	</p>
+	<h3>Directoy list</h3>
+	<p>
+		<f:render partial="Toolbox/FileAndFolderPermission/DirectoryList" arguments="{list:data.selection, icons:data.icons}"/>
+	</p>
+</f:section>

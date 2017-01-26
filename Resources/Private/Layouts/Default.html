@@ -1,0 +1,38 @@
+<f:be.container
+	enableClickMenu="false"
+	loadExtJs="false"
+	loadExtJsTheme="false"
+	enableExtJsDebug="false">
+	<div class="typo3-fullDoc">
+		<div id="typo3-docheader">
+			<div id="typo3-docheader-row1">
+				<div class="form-group" style="padding:10px 10px 10px 10px;">
+					<div class="buttonsleft">
+						<f:comment>
+							<!--
+							historyback is not productive with submitted forms!
+							<button onclick="history.back()" class="btn btn-sm btn-info">back</button>
+							-->
+						</f:comment>
+						<button onclick="location.reload()" class="btn btn-sm btn-info">Reload</button>
+						<f:render partial="Toolbox/FileAndFolderPermission/Info"/>
+					</div>
+				</div>
+			</div>
+			<div id="typo3-docheader-row2">
+				<div class="docheader-row2-left">
+					<f:be.buttons.csh />
+				</div>
+			</div>
+		</div>
+		<div id="typo3-docbody">
+			<div id="typo3-inner-docbody">
+				<f:flashMessages renderMode="div" />
+				<div class="tx_xtools">
+					<h1>Toolbox</h1>
+					<f:render section="content" />
+				</div>
+			</div>
+		</div>
+	</div>
+</f:be.container>
