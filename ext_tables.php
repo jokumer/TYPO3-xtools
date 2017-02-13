@@ -9,12 +9,12 @@ if (TYPO3_MODE === 'BE') {
         'Toolbox',
         '',
         array(
-            'Toolbox' => 'index',
+            'Toolbox' => 'index,fileAndFolderPermission,fileDuplication',
         ),
         array(
             'access' => 'user,group',
             'icon' => 'EXT:' . $_EXTKEY . '/ext_icon.svg',
-            'labels' => 'LLL:EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang.xlf',
+            'labels' => 'LLL:EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang_module.xlf',
         )
     );
 }

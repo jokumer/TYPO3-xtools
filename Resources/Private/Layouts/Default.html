@@ -14,8 +14,16 @@
 							<button onclick="history.back()" class="btn btn-sm btn-info">back</button>
 							-->
 						</f:comment>
+						<f:link.action action="index" class="btn btn-sm btn-info">Main menu</f:link.action>
 						<button onclick="location.reload()" class="btn btn-sm btn-info">Reload</button>
-						<f:render partial="Toolbox/FileAndFolderPermission/Info"/>
+						<f:switch expression="{actionMethodName}">
+							<f:case value="fileAndFolderPermissionAction">
+								<f:render partial="Toolbox/FileAndFolderPermission/Info"/>
+							</f:case>
+							<f:case value="fileDuplicationAction">
+								<f:render partial="Toolbox/FileDuplication/Info"/>
+							</f:case>
+						</f:switch>
 					</div>
 				</div>
 			</div>

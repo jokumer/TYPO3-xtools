@@ -1,6 +1,17 @@
-<f:layout name="Default" />
+<f:layout name="Default"/>
 
 <f:section name="content">
-	<h2>Index action</h2>
-	<f:flashMessages />
+	<f:flashMessages/>
+	<ul>
+		<li>
+			<f:link.action action="fileAndFolderPermission">
+				<f:translate key="action.fileAndFolderPermission"/>
+			</f:link.action>
+		</li>
+		<li>
+			<f:link.action action="fileDuplication">
+				<f:translate key="action.fileDuplication"/>
+			</f:link.action>
+		</li>
+	</ul>
 </f:section>

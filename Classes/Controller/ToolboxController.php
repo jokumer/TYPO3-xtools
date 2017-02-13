@@ -8,6 +8,7 @@ use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Mvc\View\ViewInterface;
 
 /**
  * Class ToolboxController
@@ -56,13 +57,25 @@ class ToolboxController extends ActionController
     }
 
     /**
+     * Initialize view
+     *
+     * @param ViewInterface $view
+     * @return void
+     */
+    protected function initializeView(ViewInterface $view)
+    {
+        parent::initializeView($view);
+        $view->assign('actionMethodName',$this->actionMethodName);
+    }
+
+    /**
      * Index action
      *
      * @return void
      */
     public function indexAction()
     {
-        $this->forward('fileAndFolderPermission');
+        
     }
 
     /**
@@ -93,6 +106,16 @@ class ToolboxController extends ActionController
         $data['targetPermissions']['fileCreateMask'] = isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['fileCreateMask']) ? $GLOBALS['TYPO3_CONF_VARS']['SYS']['fileCreateMask'] : '0644';
         $data['targetPermissions']['folderCreateMask'] = isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['folderCreateMask']) ? $GLOBALS['TYPO3_CONF_VARS']['SYS']['folderCreateMask'] : '0755';
         $this->view->assign('data', $data);
+    }
+
+    /**
+     * File duplication action
+     *
+     * @return void
+     */
+    public function fileDuplicationAction()
+    {
+
     }
 
     /**
