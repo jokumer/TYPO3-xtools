@@ -4,7 +4,7 @@ namespace Jokumer\Xtools\Controller;
 use Jokumer\Xtools\Controller\AbstractController;
 
 /**
- * Class ToolboxController
+ * Class FileDuplicationController
  *
  * @package TYPO3
  * @subpackage tx_xtools
@@ -12,7 +12,7 @@ use Jokumer\Xtools\Controller\AbstractController;
  * @copyright Copyright belongs to the respective authors
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ToolboxController extends AbstractController
+class FileDuplicationController extends AbstractController
 {
     /**
      * Index action
