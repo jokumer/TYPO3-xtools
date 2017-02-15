@@ -11,7 +11,7 @@ if (TYPO3_MODE === 'BE') {
         array(
             'Toolbox' => 'index',
             'FileAndFolderPermission' => 'index',
-            'FileDuplication' => 'index',
+            'FileDuplication' => 'index,showDuplications',
         ),
         array(
             'access' => 'user,group',
