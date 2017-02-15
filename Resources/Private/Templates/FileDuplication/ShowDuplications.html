@@ -2,7 +2,11 @@
 
 <f:section name="content">
 	<f:flashMessages/>
-	<f:link.action controller="FileDuplication" action="index" arguments="{selection:{storage:data.selection.storage.uid, directory:data.selection.directory}}">
+	<f:link.action
+			controller="FileDuplication"
+			action="index"
+			arguments="{selection:{storage:data.selection.storage.uid, directory:data.selection.directory}}"
+			class="btn btn-sm btn-info">
 		Back to index
 	</f:link.action>
 	<h2>
@@ -26,9 +30,11 @@
 					<tr>
 						<th>Uid</th>
 						<th>Storage (uid/name)</th>
-						<th>File</th>
-						<th>Sha1</th>
+						<th>Preview</th>
+						<th>Filename</th>
 						<th>Meta (title, descr., keywords, caption)</th>
+						<th>Date File (created, modify)</th>
+						<th>Date DB (created, modify)</th>
 					</tr>
 				</theader>
 				<tbody>
@@ -53,6 +59,17 @@
 														maxWidth="64"
 														maxHeight="64"/>
 											</f:if>
+										</a>
+									</f:then>
+									<f:else>
+										<span title="{fileDuplication.publicUrl}">NOT FOUND</span>
+									</f:else>
+								</f:if>
+							</td>
+							<td>
+								<f:if condition="{fileDuplication.publicUrl}">
+									<f:then>
+										<a href="{fileDuplication.publicUrl}" target="_blank" title="{fileDuplication.publicUrl}">
 											{fileDuplication.name}
 										</a>
 									</f:then>
@@ -62,13 +79,18 @@
 								</f:if>
 							</td>
 							<td>
-								<em>{fileDuplication.sha1}</em>
-							</td>
-							<td>
 								T: {fileDuplication.properties.title}<br/>
 								D: {fileDuplication.properties.description}<br/>
 								K: {fileDuplication.properties.keywords}<br/>
 								C: {fileDuplication.properties.caption}<br/>
+							</td>
+							<td>
+								<f:format.date format="Y.m.d. H:i">{fileDuplication.properties.creation_date}</f:format.date><br/>
+								<f:format.date format="Y.m.d. H:i">{fileDuplication.properties.modification_date}</f:format.date><br/>
+							</td>
+							<td>
+								<f:format.date format="Y.m.d. H:i">{fileDuplication.properties.crdate}</f:format.date><br/>
+								<f:format.date format="Y.m.d. H:i">{fileDuplication.properties.tstamp}</f:format.date><br/>
 							</td>
 						</tr>
 					</f:for>
