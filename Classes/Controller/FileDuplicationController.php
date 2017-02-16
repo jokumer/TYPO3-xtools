@@ -8,6 +8,7 @@ use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Filelist\FileFacade;
 
 /**
  * Class FileDuplicationController
@@ -145,7 +146,13 @@ class FileDuplicationController extends AbstractController
         if ($this->request->hasArgument('sha1')) {
             $sha1 = $this->request->getArgument('sha1');
             $fileDuplications = $this->fileRepository->getFileDuplications($this->storage, $this->directory, $sha1);
-            $this->view->assign('fileDuplications', $fileDuplications);
+            if (!empty($fileDuplications)) {
+                // Use FileFacade
+                foreach ($fileDuplications as $fileDuplication) {
+                    $fileDuplicationsFacades[] = new FileFacade($fileDuplication);
+                }
+                $this->view->assign('fileDuplications', $fileDuplicationsFacades);
+            }
         }
     }
 

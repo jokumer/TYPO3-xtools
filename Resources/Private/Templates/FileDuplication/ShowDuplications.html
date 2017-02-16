@@ -1,3 +1,5 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+	xmlns:fl="http://typo3.org/ns/TYPO3/CMS/Filelist/ViewHelpers">
 <f:layout name="Default"/>
 
 <f:section name="content">
@@ -19,7 +21,7 @@
 				Files sha1: {fileDuplications.0.sha1}<br/>
 				Files count: <f:count subject="{fileDuplications}"/><br/>
 				<f:if condition="{data.selection.storage}">
-					Storage: {data.selection.storage.name}<br/>
+					Storage [uid]: {data.selection.storage.name} [{data.selection.storage.uid}]<br/>
 				</f:if>
 				<f:if condition="{data.selection.directory}">
 					Directory: {data.selection.directory}<br/>
@@ -29,23 +31,22 @@
 				<theader>
 					<tr>
 						<th>Uid</th>
-						<th>Storage (uid/name)</th>
 						<th>Preview</th>
 						<th>Filename</th>
 						<th>Meta (title, descr., keywords, caption)</th>
 						<th>Date File (created, modify)</th>
 						<th>Date DB (created, modify)</th>
+						<th>Storage (name [uid])</th>
 					</tr>
 				</theader>
 				<tbody>
 					<f:for each="{fileDuplications}" as="fileDuplication" iteration="iterator">
 						<tr class="{f:if(condition: iterator.isEven, then: 'even', else: 'odd')}"
 							role="row">
-							<td>
-								<strong>{fileDuplication.uid}</strong>
-							</td>
-							<td>
-								{fileDuplication.storage.uid} / {fileDuplication.storage.name}
+							<td style="white-space: nowrap">
+								<fl:link.clickMenuOnIcon table="{fileDuplication.combinedIdentifier}">
+									{fileDuplication.icon->f:format.raw()} {fileDuplication.uid}
+								</fl:link.clickMenuOnIcon>
 							</td>
 							<td>
 								<f:if condition="{fileDuplication.publicUrl}">
@@ -91,6 +92,9 @@
 							<td>
 								<f:format.date format="Y.m.d. H:i">{fileDuplication.properties.crdate}</f:format.date><br/>
 								<f:format.date format="Y.m.d. H:i">{fileDuplication.properties.tstamp}</f:format.date><br/>
+							</td>
+							<td>
+								{fileDuplication.storage.name} [{fileDuplication.storage.uid}]
 							</td>
 						</tr>
 					</f:for>

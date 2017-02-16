@@ -11,7 +11,7 @@
 									<f:link.action
 											arguments="{selection:{storage:storage.uid, directory:''}}"
 											title="{storage.description}">
-										<b>{storage.name}</b> [uid:{storage.uid}]
+										<b>{storage.name}</b> [{storage.uid}]
 									</f:link.action>
 									<f:if condition="{data.list.directories}">
 										<f:render partial="Toolbox/FileDuplication/DirectoryList" arguments="{_all}"/>
@@ -22,14 +22,14 @@
 									<f:link.action
 											arguments="{selection:{storage:storage.uid, directory:''}}"
 											title="{storage.description}">
-										{storage.name} [uid:{storage.uid}]
+										{storage.name} [{storage.uid}]
 									</f:link.action>
 								</f:else>
 							</f:if>
 						</f:then>
 						<f:else>
 							{data.icons.apps-filetree-folder-locked}
-							{storage.name} [uid:{storage.uid}]
+							{storage.name} [{storage.uid}]
 						</f:else>
 					</f:if>
 				</li>
