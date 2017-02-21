@@ -24,6 +24,7 @@
 				<theader>
 					<tr>
 						<th>Count</th>
+						<th>Preview</th>
 						<th>File (first found)</th>
 						<th>Type</th>
 						<th>Sha1</th>
@@ -35,6 +36,26 @@
 						role="row">
 						<td>
 							<strong>{filesDuplication.totalCount}</strong>
+						</td>
+						<td>
+							<f:if condition="{filesDuplication.uid}">
+								<f:then>
+									<a href="{f:uri.image(src:filesDuplication.uid, treatIdAsReference:0)}" target="_blank" title="{f:uri.image(src:filesDuplication.uid, treatIdAsReference:0)}">
+										<f:if condition="{filesDuplication.type} == 2">
+											<f:image
+													src="{filesDuplication.uid}"
+													alt="{filesDuplication.name}"
+													treatIdAsReference="0"
+													maxWidth="64"
+													maxHeight="64"
+													style="max-height:64px; max-width:64px;"/>
+										</f:if>
+									</a>
+								</f:then>
+								<f:else>
+									<span title="{filesDuplication.publicUrl}">NOT FOUND</span>
+								</f:else>
+							</f:if>
 						</td>
 						<td>
 							<f:link.action action="showDuplications" controller="FileDuplication" arguments="{selection:{storage:data.selection.storage.uid, directory:data.selection.directory}, sha1:filesDuplication.sha1}">
