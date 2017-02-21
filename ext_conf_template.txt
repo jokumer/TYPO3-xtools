@@ -1,0 +1,2 @@
+# cat=Xtools/1; type=integer; label=Default max items shown in paginations, default is 50
+pagination_itemsPerPage = 10

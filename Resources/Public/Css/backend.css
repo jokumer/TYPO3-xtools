@@ -1,0 +1,55 @@
+ul.f3-widget-paginator {
+    border: 1px solid #cccccc;
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 1.25em;
+    padding: 5px;
+    overflow: hidden;
+    list-style-type: none;
+    background-color: #f7f7f7;
+}
+ul.f3-widget-paginator li {
+    float: left;
+    display: block;
+    background-color: #fff;
+    border: 1px solid #589edc;
+    border-radius: 2px;
+    color: #000;
+    margin: 0 5px 0 0;
+    padding: 5px 10px;
+    line-height: normal;
+}
+ul.f3-widget-paginator li.previous,
+ul.f3-widget-paginator li.next {
+    background-color: #6daae0;
+    border: 1px solid #589edc;
+    color: #fff;
+}
+ul.f3-widget-paginator li.current {
+    background-color: #dddddd;
+    border-color: #999999;
+    color: #000;
+}
+ul.f3-widget-paginator li.disabled {
+    padding: 5px 10px;
+}
+ul.f3-widget-paginator li a {
+    color: #4074a2;
+    display: inline-block;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    padding: 1em;
+    margin: -1em;
+}
+ul.f3-widget-paginator li.previous a,
+ul.f3-widget-paginator li.next a {
+    color: #fff;
+}
+ul.f3-widget-paginator li a:hover {
+    color: #000;
+    text-decoration: none;
+}
+ul.f3-widget-paginator li.next {
+    margin-right: 15px;
+}

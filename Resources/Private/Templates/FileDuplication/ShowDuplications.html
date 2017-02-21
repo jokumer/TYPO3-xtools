@@ -27,7 +27,8 @@
 					Directory: {data.selection.directory}<br/>
 				</f:if>
 			</p>
-			<table class="t3-table t3-datatable">
+			<f:widget.paginate objects="{fileDuplications}" as="results" configuration="{itemsPerPage: 50, insertAbove: 1 insertBelow: 1}">
+				<table class="t3-table t3-datatable">
 				<theader>
 					<tr>
 						<th>Uid</th>
@@ -40,7 +41,7 @@
 					</tr>
 				</theader>
 				<tbody>
-					<f:for each="{fileDuplications}" as="fileDuplication" iteration="iterator">
+					<f:for each="{results}" as="fileDuplication" iteration="iterator">
 						<tr class="{f:if(condition: iterator.isEven, then: 'even', else: 'odd')}"
 							role="row">
 							<td style="white-space: nowrap">
@@ -101,6 +102,7 @@
 					</f:for>
 				</tbody>
 			</table>
+			</f:widget.paginate>
 		</f:then>
 		<f:else>
 			No files found!
