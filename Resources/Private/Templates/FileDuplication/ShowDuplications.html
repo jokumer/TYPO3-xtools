@@ -27,85 +27,96 @@
 					Directory: {data.selection.directory}<br/>
 				</f:if>
 			</p>
-			<f:widget.paginate objects="{fileDuplications}" as="results" configuration="{itemsPerPage: 50, insertAbove: 1 insertBelow: 1}">
-				<table class="t3-table t3-datatable">
-				<theader>
-					<tr>
-						<th>Uid</th>
-						<th>Preview</th>
-						<th>Filename</th>
-						<th>Meta (title, descr., keywords, caption)</th>
-						<th>Date File (created, modify)</th>
-						<th>Date DB (created, modify)</th>
-						<th>Storage (name [uid])</th>
-					</tr>
-				</theader>
-				<tbody>
-					<f:for each="{results}" as="fileDuplication" iteration="iterator">
-						<tr class="{f:if(condition: iterator.isEven, then: 'even', else: 'odd')}"
-							role="row">
-							<td style="white-space: nowrap">
-								<fl:link.clickMenuOnIcon table="{fileDuplication.combinedIdentifier}">
-									{fileDuplication.icon->f:format.raw()} {fileDuplication.uid}
-								</fl:link.clickMenuOnIcon>
-							</td>
-							<td>
-								<f:if condition="{fileDuplication.publicUrl}">
-									<f:then>
-										<a href="{fileDuplication.publicUrl}" target="_blank" title="{fileDuplication.publicUrl}">
-											<f:if condition="{fileDuplication.type} == 2">
-												<f:image
-														src="{fileDuplication.publicUrl}"
-														alt="{fileDuplication.name}"
-														treatIdAsReference="0"
-														maxWidth="64"
-														maxHeight="64"
-														style="max-height:64px; max-width:64px;"/>
-											</f:if>
-										</a>
-									</f:then>
-									<f:else>
-										<span title="{fileDuplication.publicUrl}">NOT FOUND</span>
-									</f:else>
-								</f:if>
-							</td>
-							<td>
-								<f:if condition="{fileDuplication.publicUrl}">
-									<f:then>
-										<a href="{fileDuplication.publicUrl}" target="_blank" title="{fileDuplication.publicUrl}">
-											{fileDuplication.name}
-										</a>
-									</f:then>
-									<f:else>
-										<span title="{fileDuplication.publicUrl}">{fileDuplication.name} NOT FOUND</span>
-									</f:else>
-								</f:if>
-							</td>
-							<td>
-								T: {fileDuplication.properties.title}<br/>
-								D: {fileDuplication.properties.description}<br/>
-								K: {fileDuplication.properties.keywords}<br/>
-								C: {fileDuplication.properties.caption}<br/>
-							</td>
-							<td>
-								<f:format.date format="Y.m.d. H:i">{fileDuplication.properties.creation_date}</f:format.date><br/>
-								<f:format.date format="Y.m.d. H:i">{fileDuplication.properties.modification_date}</f:format.date><br/>
-							</td>
-							<td>
-								<f:format.date format="Y.m.d. H:i">{fileDuplication.properties.crdate}</f:format.date><br/>
-								<f:format.date format="Y.m.d. H:i">{fileDuplication.properties.tstamp}</f:format.date><br/>
-							</td>
-							<td>
-								{fileDuplication.storage.name} [{fileDuplication.storage.uid}]
-							</td>
-						</tr>
-					</f:for>
-				</tbody>
-			</table>
-			</f:widget.paginate>
+			<f:if condition="{f:count(subject:'{fileDuplications}')} > {extensionConfiguration.pagination_itemsPerPage}">
+				<f:then>
+					<f:widget.paginate objects="{fileDuplications}" as="results" configuration="{itemsPerPage: '{extensionConfiguration.pagination_itemsPerPage}', insertAbove: 1 insertBelow: 1}">
+						<f:render section="list" arguments="{results:results, data:data}"/>
+					</f:widget.paginate>
+				</f:then>
+				<f:else>
+					<f:render section="list" arguments="{results:fileDuplications, data:data}"/>
+				</f:else>
+			</f:if>
 		</f:then>
 		<f:else>
 			No files found!
 		</f:else>
 	</f:if>
+</f:section>
+
+<f:section name="list">
+	<table class="t3-table t3-datatable">
+		<theader>
+			<tr>
+				<th>Uid</th>
+				<th>Preview</th>
+				<th>Filename</th>
+				<th>Meta (title, descr., keywords, caption)</th>
+				<th>Date File (created, modify)</th>
+				<th>Date DB (created, modify)</th>
+				<th>Storage (name [uid])</th>
+			</tr>
+		</theader>
+		<tbody>
+		<f:for each="{results}" as="fileDuplication" iteration="iterator">
+			<tr class="{f:if(condition: iterator.isEven, then: 'even', else: 'odd')}"
+				role="row">
+				<td style="white-space: nowrap">
+					<fl:link.clickMenuOnIcon table="{fileDuplication.combinedIdentifier}">
+						{fileDuplication.icon->f:format.raw()} {fileDuplication.uid}
+					</fl:link.clickMenuOnIcon>
+				</td>
+				<td>
+					<f:if condition="{fileDuplication.publicUrl}">
+						<f:then>
+							<a href="{fileDuplication.publicUrl}" target="_blank" title="{fileDuplication.publicUrl}">
+								<f:if condition="{fileDuplication.type} == 2">
+									<f:image
+											src="{fileDuplication.publicUrl}"
+											alt="{fileDuplication.name}"
+											treatIdAsReference="0"
+											maxWidth="64"
+											maxHeight="64"
+											style="max-height:64px; max-width:64px;"/>
+								</f:if>
+							</a>
+						</f:then>
+						<f:else>
+							<span title="{fileDuplication.publicUrl}">NOT FOUND</span>
+						</f:else>
+					</f:if>
+				</td>
+				<td>
+					<f:if condition="{fileDuplication.publicUrl}">
+						<f:then>
+							<a href="{fileDuplication.publicUrl}" target="_blank" title="{fileDuplication.publicUrl}">
+								{fileDuplication.name}
+							</a>
+						</f:then>
+						<f:else>
+							<span title="{fileDuplication.publicUrl}">{fileDuplication.name} NOT FOUND</span>
+						</f:else>
+					</f:if>
+				</td>
+				<td>
+					T: {fileDuplication.properties.title}<br/>
+					D: {fileDuplication.properties.description}<br/>
+					K: {fileDuplication.properties.keywords}<br/>
+					C: {fileDuplication.properties.caption}<br/>
+				</td>
+				<td>
+					<f:format.date format="Y.m.d. H:i">{fileDuplication.properties.creation_date}</f:format.date><br/>
+					<f:format.date format="Y.m.d. H:i">{fileDuplication.properties.modification_date}</f:format.date><br/>
+				</td>
+				<td>
+					<f:format.date format="Y.m.d. H:i">{fileDuplication.properties.crdate}</f:format.date><br/>
+					<f:format.date format="Y.m.d. H:i">{fileDuplication.properties.tstamp}</f:format.date><br/>
+				</td>
+				<td>
+					{fileDuplication.storage.name} [{fileDuplication.storage.uid}]
+				</td>
+			</tr>
+		</f:for>
+		</tbody>
+	</table>
 </f:section>
