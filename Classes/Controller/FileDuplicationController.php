@@ -3,6 +3,7 @@ namespace Jokumer\Xtools\Controller;
 
 use Jokumer\Xtools\Controller\AbstractController;
 use Jokumer\Xtools\Domain\Repository\FileRepository;
+use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Imaging\Icon;
@@ -40,14 +41,14 @@ class FileDuplicationController extends AbstractController
      * 
      * @var ResourceStorage
      */
-    protected $storage;
+    protected $storage = null;
 
     /**
      * Directory, current selected
      * 
      * @var string $directory
      */
-    protected $directory;
+    protected $directory = null;
 
     /**
      * Available storages
@@ -148,11 +149,62 @@ class FileDuplicationController extends AbstractController
             $fileDuplications = $this->fileRepository->getFileDuplications($this->storage, $this->directory, $sha1);
             if (!empty($fileDuplications)) {
                 // Assign fileDuplicationsArray use FileFacade, add usage count
+                $count = 0;
                 foreach ($fileDuplications as $key => $fileDuplication) {
-                    $fileDuplicationsArray[$key]['fileFacade'] = new FileFacade($fileDuplication['fileObject']);
-                    $fileDuplicationsArray[$key]['usage'] = $fileDuplication['usage'];
+                    $fileDuplicationsArray[$count]['fileFacade'] = new FileFacade($fileDuplication['fileObject']);
+                    $fileDuplicationsArray[$count]['usage'] = $fileDuplication['usage'];
+                    $count++;
                 }
                 $this->view->assign('fileDuplications', $fileDuplicationsArray);
+            }
+        }
+    }
+
+    /**
+     * Solve duplications action
+     *
+     * @return void
+     */
+    public function solveDuplicationsAction()
+    {
+        // Get request
+        $preferredFileUid = null;
+        if ($this->request->hasArgument('preferredFileUid')) {
+            $preferredFileUid = $this->request->getArgument('preferredFileUid');
+            #\TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($preferredFileUid, 'Preferred file uid');
+        }
+        $sha1 = null;
+        if ($this->request->hasArgument('sha1')) {
+            $sha1 = $this->request->getArgument('sha1');
+            #\TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($sha1, 'SHA1');
+        }
+        // Get concerning file duplications
+        if ($preferredFileUid && $sha1 && $this->storage) {
+            #\TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($this->storage, 'Storage');
+            #\TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($this->directory, 'Directory');
+            $fileDuplications = $this->fileRepository->getFileDuplications($this->storage, $this->directory, $sha1);
+            #\TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($fileDuplications, 'FileDuplicationController:183');
+            // Remove preferred file from stack
+            if (!empty($fileDuplications)) {
+                unset($fileDuplications[$preferredFileUid]);
+                #\TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($fileDuplications, 'FileDuplicationController:183');
+                // Replace each duplicated file with preferred file in sys_file_reference
+                if (!empty($fileDuplications)) {
+                    foreach ($fileDuplications as $fileUid => $duplicat) {
+                        if (intval($duplicat['usage']) > 0 && $duplicat['fileObject'] instanceof File) {
+                            $fileObjectUid = $duplicat['fileObject']->getUid();
+                            // Get file references
+                            $fileReferences = $this->fileRepository->getFileReferences($duplicat['fileObject'], $this->storage, $this->directory);
+                            \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($fileReferences, 'FileDuplicationController:198');
+                            // Update file reference
+                            # @todo: database update - replace uid_local with uid of preferred file uid
+                            // Remove file from file system
+                            # @todo: rm -f file
+                            // Assing results to view
+                            # @todo: $this->view->assign('filesReplacements', $filesReplacements);
+                        }
+                    }
+                }
             }
         }
     }

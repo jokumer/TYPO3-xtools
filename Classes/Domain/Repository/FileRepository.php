@@ -2,6 +2,7 @@
 namespace Jokumer\Xtools\Domain\Repository;
 
 use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
+use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 
 /**
@@ -143,5 +144,36 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
             $fileStorages = $rows;
         }
         return $fileStorages;
+    }
+
+    /**
+     * Get file references
+     * Returns array of file references by file resource uid
+     *
+     * @param File $file
+     * @param ResourceStorage $storageUid
+     * @param string $directory
+     * @param integer $limit
+     * @return QueryResultInterface
+     */
+    public function getFileReferences(File $file, $storage = null, $directory = null, $limit = 1000) {
+        $fileReferences = null;
+        if ($file instanceof File) {
+            // @todo: add where clause (not deleted, ....)
+            $addWhere = '';
+            $rows = $this->getDatabaseConnection()->exec_SELECTgetRows(
+                '*',
+                'sys_file_reference',
+                '1=1' . $addWhere,
+                'uid_local = ' . $file->getUid(),
+                '',
+                $limit,
+                'uid'
+            );
+            if (!empty($rows)) {
+                $fileReferences = $rows;
+            }
+        }
+        return $fileReferences;
     }
 }

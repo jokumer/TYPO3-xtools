@@ -1,0 +1,19 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+	xmlns:fl="http://typo3.org/ns/TYPO3/CMS/Filelist/ViewHelpers">
+<f:layout name="Default"/>
+
+<f:section name="content">
+	<f:flashMessages/>
+	<f:link.action
+			controller="FileDuplication"
+			action="index"
+			arguments="{selection:{storage:data.selection.storage.uid, directory:data.selection.directory}}"
+			class="btn btn-sm btn-info">
+		Back to index
+	</f:link.action>
+	<h2>
+		<f:translate key="controller.fileDuplication.action.index"/>
+	</h2>
+	<h3>Solve duplications</h3>
+	... here to come ...
+</f:section>
