@@ -147,11 +147,12 @@ class FileDuplicationController extends AbstractController
             $sha1 = $this->request->getArgument('sha1');
             $fileDuplications = $this->fileRepository->getFileDuplications($this->storage, $this->directory, $sha1);
             if (!empty($fileDuplications)) {
-                // Use FileFacade
-                foreach ($fileDuplications as $fileDuplication) {
-                    $fileDuplicationsFacades[] = new FileFacade($fileDuplication);
+                // Assign fileDuplicationsArray use FileFacade, add usage count
+                foreach ($fileDuplications as $key => $fileDuplication) {
+                    $fileDuplicationsArray[$key]['fileFacade'] = new FileFacade($fileDuplication['fileObject']);
+                    $fileDuplicationsArray[$key]['usage'] = $fileDuplication['usage'];
                 }
-                $this->view->assign('fileDuplications', $fileDuplicationsFacades);
+                $this->view->assign('fileDuplications', $fileDuplicationsArray);
             }
         }
     }

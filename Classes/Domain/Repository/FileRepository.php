@@ -88,29 +88,28 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
     public function getFileDuplications($storage = null, $directory = null, $sha1 = '', $limit = 1000) {
         $fileDuplications = null;
         if ($storage instanceof ResourceStorage) {
-            $addWhereArray['storage'] = 'storage = ' . $storage->getUid();
+            $addWhereArray['storage'] = 'sf.storage = ' . $storage->getUid();
             if ($directory !== null) {
-                $addWhereArray['storage'] = 'identifier LIKE \'' . $directory . '%\'';
+                $addWhereArray['storage'] = 'sf.identifier LIKE \'' . $directory . '%\'';
             }
-            $addWhereArray['excludeProcessedFiles'] = '(identifier NOT LIKE \'%/_processed_/%\' AND pid = 0)';
+            $addWhereArray['excludeProcessedFiles'] = '(sf.identifier NOT LIKE \'%/_processed_/%\' AND sf.pid = 0)';
             $addWhere = ' AND ' . implode(' AND ', $addWhereArray);
             if ($sha1) {
                 $rows = $this->getDatabaseConnection()->exec_SELECTgetRows(
-                    'uid, sha1, name',
-                    'sys_file',
-                    'sha1 = ' . $this->getDatabaseConnection()->fullQuoteStr($sha1, 'sys_file') . $addWhere,
-                    '',
-                    'uid',
+                    'sf.uid, sf.sha1, sf.name, count(sf.uid) sfrCount',
+                    'sys_file AS sf LEFT JOIN sys_file_reference AS sfr ON sf.uid = sfr.uid_local',
+                    'sf.sha1 = ' . $this->getDatabaseConnection()->fullQuoteStr($sha1, 'sys_file') . $addWhere,
+                    'sf.uid',
+                    'sfrCount DESC',
                     $limit,
                     'uid'
                 );
                 if (!empty($rows)) {
-                    $fileDuplicationsUids = array_keys($rows);
                     $fileDuplications = [];
-                    foreach ($fileDuplicationsUids as $fileDuplicationsUid) {
+                    foreach ($rows as $key => $row) {
                         try {
-                            #$fileDuplications[] = $this->factory->getFileReferenceObject($fileDuplicationsUid);
-                            $fileDuplications[] = $this->factory->getFileObject($fileDuplicationsUid);
+                            $fileDuplications[$key]['fileObject'] = $this->factory->getFileObject($row['uid']);
+                            $fileDuplications[$key]['usage'] = $row['sfrCount'];
                         } catch (ResourceDoesNotExistException $exception) {
                             // No handling, just omit the invalid reference uid
                         }

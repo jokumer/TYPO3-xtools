@@ -18,7 +18,7 @@
 	<f:if condition="{fileDuplications}">
 		<f:then>
 			<p>
-				Files sha1: {fileDuplications.0.sha1}<br/>
+				Files sha1: {fileDuplications.0.fileFacade.sha1}<br/>
 				Files count: <f:count subject="{fileDuplications}"/><br/>
 				<f:if condition="{data.selection.storage}">
 					Storage [uid]: {data.selection.storage.name} [{data.selection.storage.uid}]<br/>
@@ -54,7 +54,7 @@
 				<th>Meta (title, descr., keywords, caption)</th>
 				<th>Date File (created, modify)</th>
 				<th>Date DB (created, modify)</th>
-				<th>Storage (name [uid])</th>
+				<th>Usage</th>
 			</tr>
 		</theader>
 		<tbody>
@@ -62,18 +62,18 @@
 			<tr class="{f:if(condition: iterator.isEven, then: 'even', else: 'odd')}"
 				role="row">
 				<td style="white-space: nowrap">
-					<fl:link.clickMenuOnIcon table="{fileDuplication.combinedIdentifier}">
-						{fileDuplication.icon->f:format.raw()} {fileDuplication.uid}
+					<fl:link.clickMenuOnIcon table="{fileDuplication.fileFacade.combinedIdentifier}">
+						{fileDuplication.fileFacade.icon->f:format.raw()} {fileDuplication.fileFacade.uid}
 					</fl:link.clickMenuOnIcon>
 				</td>
 				<td>
-					<f:if condition="{fileDuplication.publicUrl}">
+					<f:if condition="{fileDuplication.fileFacade.publicUrl}">
 						<f:then>
-							<a href="{fileDuplication.publicUrl}" target="_blank" title="{fileDuplication.publicUrl}">
-								<f:if condition="{fileDuplication.type} == 2">
+							<a href="{fileDuplication.fileFacade.publicUrl}" target="_blank" title="{fileDuplication.fileFacade.publicUrl}">
+								<f:if condition="{fileDuplication.fileFacade.type} == 2">
 									<f:image
-											src="{fileDuplication.publicUrl}"
-											alt="{fileDuplication.name}"
+											src="{fileDuplication.fileFacade.publicUrl}"
+											alt="{fileDuplication.fileFacade.name}"
 											treatIdAsReference="0"
 											maxWidth="64"
 											maxHeight="64"
@@ -82,38 +82,38 @@
 							</a>
 						</f:then>
 						<f:else>
-							<span title="{fileDuplication.publicUrl}">NOT FOUND</span>
+							<span title="{fileDuplication.fileFacade.publicUrl}">NOT FOUND</span>
 						</f:else>
 					</f:if>
 				</td>
 				<td>
-					<f:if condition="{fileDuplication.publicUrl}">
+					<f:if condition="{fileDuplication.fileFacade.publicUrl}">
 						<f:then>
-							<a href="{fileDuplication.publicUrl}" target="_blank" title="{fileDuplication.publicUrl}">
-								{fileDuplication.name}
+							<a href="{fileDuplication.fileFacade.publicUrl}" target="_blank" title="{fileDuplication.fileFacade.publicUrl}">
+								{fileDuplication.fileFacade.name}
 							</a>
 						</f:then>
 						<f:else>
-							<span title="{fileDuplication.publicUrl}">{fileDuplication.name} NOT FOUND</span>
+							<span title="{fileDuplication.fileFacade.publicUrl}">{fileDuplication.fileFacade.name} NOT FOUND</span>
 						</f:else>
 					</f:if>
 				</td>
 				<td>
-					T: {fileDuplication.properties.title}<br/>
-					D: {fileDuplication.properties.description}<br/>
-					K: {fileDuplication.properties.keywords}<br/>
-					C: {fileDuplication.properties.caption}<br/>
+					T: {fileDuplication.fileFacade.properties.title}<br/>
+					D: {fileDuplication.fileFacade.properties.description}<br/>
+					K: {fileDuplication.fileFacade.properties.keywords}<br/>
+					C: {fileDuplication.fileFacade.properties.caption}<br/>
 				</td>
 				<td>
-					<f:format.date format="Y.m.d. H:i">{fileDuplication.properties.creation_date}</f:format.date><br/>
-					<f:format.date format="Y.m.d. H:i">{fileDuplication.properties.modification_date}</f:format.date><br/>
+					<f:format.date format="Y.m.d. H:i">{fileDuplication.fileFacade.properties.creation_date}</f:format.date><br/>
+					<f:format.date format="Y.m.d. H:i">{fileDuplication.fileFacade.properties.modification_date}</f:format.date><br/>
 				</td>
 				<td>
-					<f:format.date format="Y.m.d. H:i">{fileDuplication.properties.crdate}</f:format.date><br/>
-					<f:format.date format="Y.m.d. H:i">{fileDuplication.properties.tstamp}</f:format.date><br/>
+					<f:format.date format="Y.m.d. H:i">{fileDuplication.fileFacade.properties.crdate}</f:format.date><br/>
+					<f:format.date format="Y.m.d. H:i">{fileDuplication.fileFacade.properties.tstamp}</f:format.date><br/>
 				</td>
 				<td>
-					{fileDuplication.storage.name} [{fileDuplication.storage.uid}]
+					{fileDuplication.usage}
 				</td>
 			</tr>
 		</f:for>
