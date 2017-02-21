@@ -53,3 +53,8 @@ ul.f3-widget-paginator li a:hover {
 ul.f3-widget-paginator li.next {
     margin-right: 15px;
 }
+.table > thead > tr > td,
+.table > tbody > tr > td,
+.table > tfoot > tr > td {
+    vertical-align: top;
+}
