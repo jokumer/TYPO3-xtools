@@ -22,7 +22,13 @@
 			</p>
 			<f:if condition="{f:count(subject:'{filesDuplications}')} > {extensionConfiguration.pagination_itemsPerPage}">
 				<f:then>
-					<f:widget.paginate objects="{filesDuplications}" as="results" configuration="{itemsPerPage: '{extensionConfiguration.pagination_itemsPerPage}', insertAbove: 1 insertBelow: 1}">
+					<f:widget.paginate objects="{filesDuplications}"
+									   as="results"
+									   configuration="{
+									     itemsPerPage: '{extensionConfiguration.pagination_itemsPerPage}',
+									     insertAbove: 1,
+									     insertBelow: 1
+									   }">
 						<f:render section="list" arguments="{results:results, data:data}"/>
 					</f:widget.paginate>
 				</f:then>
@@ -64,7 +70,9 @@
 				<td>
 					<f:if condition="{filesDuplication.uid}">
 						<f:then>
-							<a href="{f:uri.image(src:filesDuplication.uid, treatIdAsReference:0)}" target="_blank" title="{f:uri.image(src:filesDuplication.uid, treatIdAsReference:0)}">
+							<a href="{f:uri.image(src:filesDuplication.uid, treatIdAsReference:0)}"
+							   target="_blank"
+							   title="{f:uri.image(src:filesDuplication.uid, treatIdAsReference:0)}">
 								<f:if condition="{filesDuplication.type} == 2">
 									<f:image
 											src="{filesDuplication.uid}"
@@ -82,7 +90,12 @@
 					</f:if>
 				</td>
 				<td>
-					<f:link.action action="showDuplications" controller="FileDuplication" arguments="{selection:{storage:data.selection.storage.uid, directory:data.selection.directory}, sha1:filesDuplication.sha1}">
+					<f:link.action action="showDuplications"
+								   controller="FileDuplication"
+								   arguments="{
+								     selection:{storage:data.selection.storage.uid, directory:data.selection.directory},
+								     sha1:filesDuplication.sha1
+								   }">
 						{filesDuplication.name}
 					</f:link.action>
 				</td>

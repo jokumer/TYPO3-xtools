@@ -10,9 +10,11 @@
 								<b>{directory.name}</b>
 							</f:link.action>
 							<i style="color: grey;">
-								[ <f:render partial="Toolbox/FileAndFolderPermission/DirectoryProperties" arguments="{directory:directory}"/> ]
+								[ <f:render partial="Toolbox/FileAndFolderPermission/DirectoryProperties"
+											arguments="{directory:directory}"/> ]
 							</i>
-							<f:render partial="Toolbox/FileAndFolderPermission/DirectoryList" arguments="{list:list.selection, icons:icons}"/>
+							<f:render partial="Toolbox/FileAndFolderPermission/DirectoryList"
+									  arguments="{list:list.selection, icons:icons}"/>
 						</f:then>
 						<f:else>
 							{icons.apps-filetree-folder-default}
@@ -20,7 +22,8 @@
 								<b>{directory.name}</b>
 							</f:link.action>
 							<i style="color: grey;">
-								[ <f:render partial="Toolbox/FileAndFolderPermission/DirectoryProperties" arguments="{directory:directory}"/> ]
+								[ <f:render partial="Toolbox/FileAndFolderPermission/DirectoryProperties"
+											arguments="{directory:directory}"/> ]
 							</i>
 						</f:else>
 					</f:if>

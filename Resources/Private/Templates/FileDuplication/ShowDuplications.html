@@ -29,7 +29,13 @@
 			</p>
 			<f:if condition="{f:count(subject:'{fileDuplications}')} > {extensionConfiguration.pagination_itemsPerPage}">
 				<f:then>
-					<f:widget.paginate objects="{fileDuplications}" as="results" configuration="{itemsPerPage: '{extensionConfiguration.pagination_itemsPerPage}', insertAbove: 1 insertBelow: 1}">
+					<f:widget.paginate objects="{fileDuplications}"
+									   as="results"
+									   configuration="{
+									     itemsPerPage: '{extensionConfiguration.pagination_itemsPerPage}',
+									     insertAbove: 1,
+									     insertBelow: 1
+									   }">
 						<f:render section="list" arguments="{results:results, data:data}"/>
 					</f:widget.paginate>
 				</f:then>
@@ -69,7 +75,9 @@
 						<f:if condition="{iterator.isFirst}">
 							<f:form.hidden name="sha1" value="{fileDuplication.fileFacade.sha1}"/>
 						</f:if>
-						<f:form.radio id="preferred-file-selection-{fileDuplication.fileFacade.uid}" name="preferredFileUid" value="{fileDuplication.fileFacade.uid}"/>
+						<f:form.radio id="preferred-file-selection-{fileDuplication.fileFacade.uid}"
+									  name="preferredFileUid"
+									  value="{fileDuplication.fileFacade.uid}"/>
 					</td>
 					<td style="white-space: nowrap">
 						<fl:link.clickMenuOnIcon table="{fileDuplication.fileFacade.combinedIdentifier}">
@@ -79,7 +87,9 @@
 					<td>
 						<f:if condition="{fileDuplication.fileFacade.publicUrl}">
 							<f:then>
-								<a href="{fileDuplication.fileFacade.publicUrl}" target="_blank" title="{fileDuplication.fileFacade.publicUrl}">
+								<a href="{fileDuplication.fileFacade.publicUrl}"
+								   target="_blank"
+								   title="{fileDuplication.fileFacade.publicUrl}">
 									<f:if condition="{fileDuplication.fileFacade.type} == 2">
 										<f:image
 												image="{fileDuplication.fileFacade.resource}"
@@ -101,12 +111,16 @@
 					<td>
 						<f:if condition="{fileDuplication.fileFacade.publicUrl}">
 							<f:then>
-								<a href="{fileDuplication.fileFacade.publicUrl}" target="_blank" title="{fileDuplication.fileFacade.publicUrl}">
+								<a href="{fileDuplication.fileFacade.publicUrl}"
+								   target="_blank"
+								   title="{fileDuplication.fileFacade.publicUrl}">
 									{fileDuplication.fileFacade.name}
 								</a>
 							</f:then>
 							<f:else>
-								<span title="{fileDuplication.fileFacade.publicUrl}">{fileDuplication.fileFacade.name} NOT FOUND</span>
+								<span title="{fileDuplication.fileFacade.publicUrl}">
+									{fileDuplication.fileFacade.name} NOT FOUND
+								</span>
 							</f:else>
 						</f:if>
 					</td>
@@ -117,12 +131,20 @@
 						<b>Caption</b>:&nbsp;{fileDuplication.fileFacade.properties.caption}<br/>
 					</td>
 					<td>
-						<f:format.date format="Y.m.d. H:i">{fileDuplication.fileFacade.properties.creation_date}</f:format.date><br/>
-						<f:format.date format="Y.m.d. H:i">{fileDuplication.fileFacade.properties.modification_date}</f:format.date><br/>
+						<f:format.date format="Y.m.d. H:i">
+							{fileDuplication.fileFacade.properties.creation_date}
+						</f:format.date><br/>
+						<f:format.date format="Y.m.d. H:i">
+							{fileDuplication.fileFacade.properties.modification_date}
+						</f:format.date><br/>
 					</td>
 					<td>
-						<f:format.date format="Y.m.d. H:i">{fileDuplication.fileFacade.properties.crdate}</f:format.date><br/>
-						<f:format.date format="Y.m.d. H:i">{fileDuplication.fileFacade.properties.tstamp}</f:format.date><br/>
+						<f:format.date format="Y.m.d. H:i">
+							{fileDuplication.fileFacade.properties.crdate}
+						</f:format.date><br/>
+						<f:format.date format="Y.m.d. H:i">
+							{fileDuplication.fileFacade.properties.tstamp}
+						</f:format.date><br/>
 					</td>
 					<td>
 						{fileDuplication.usage}
