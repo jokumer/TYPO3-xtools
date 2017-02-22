@@ -152,7 +152,7 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
     }
 
     /**
-     * Get file references
+     * Get sys_file_references
      * Returns array of file references by file resource uid
      *
      * @param File $file
@@ -161,16 +161,16 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
      * @param integer $limit
      * @return QueryResultInterface
      */
-    public function getFileReferences(File $file, $storage = null, $directory = null, $limit = 1000) {
+    public function getSysFileReferences(File $file, $storage = null, $directory = null, $limit = 1000) {
         $fileReferences = null;
         if ($file instanceof File) {
-            // @todo: add where clause (not deleted, ....)
-            $addWhere = '';
+            $addWhereArray['sysFile'] = 'uid_local = ' . $file->getUid();
+            $addWhere = ' AND ' . implode(' AND ', $addWhereArray);
             $rows = $this->getDatabaseConnection()->exec_SELECTgetRows(
-                '*',
+                'uid',
                 'sys_file_reference',
                 '1=1' . $addWhere,
-                'uid_local = ' . $file->getUid(),
+                '',
                 '',
                 $limit,
                 'uid'
@@ -180,5 +180,37 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
             }
         }
         return $fileReferences;
+    }
+
+    /**
+     * Update sys_file_reference
+     * Including updateRefIndex
+     *
+     * @param integer $sysFileReferenceUid
+     * @param array $updateFieldsArray
+     * @param bool $updateRefIndex Default = true
+     * @return bool
+     */
+    public function updateSysFileReference($sysFileReferenceUid, $updateFieldsArray, $updateRefIndex = true)
+    {
+        $updateResult = false;
+        if (intval($sysFileReferenceUid) && !empty($updateFieldsArray)) {
+            $updateResult = $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+                'sys_file_reference',
+                'uid = ' . intval($sysFileReferenceUid),
+                $updateFieldsArray
+            );
+            if ($updateResult) {
+                if ($updateRefIndex) {
+                    $this->updateUtility->updateRefIndex('sys_file_reference', intval($sysFileReferenceUid));
+                }
+                $resultDebug[__FUNCTION__]['success'][] = $sysFileReferenceUid;
+            } else {
+                # failed 1
+            }
+        } else {
+            # failed 2
+        }
+        return $updateResult;
     }
 }

@@ -167,46 +167,60 @@ class FileDuplicationController extends AbstractController
      */
     public function solveDuplicationsAction()
     {
+        $fileReplacements = null;
         // Get request
         $preferredFileUid = null;
         if ($this->request->hasArgument('preferredFileUid')) {
             $preferredFileUid = $this->request->getArgument('preferredFileUid');
-            #\TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($preferredFileUid, 'Preferred file uid');
         }
         $sha1 = null;
         if ($this->request->hasArgument('sha1')) {
             $sha1 = $this->request->getArgument('sha1');
-            #\TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($sha1, 'SHA1');
         }
         // Get concerning file duplications
-        if ($preferredFileUid && $sha1 && $this->storage) {
-            #\TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($this->storage, 'Storage');
-            #\TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($this->directory, 'Directory');
+        if (intval($preferredFileUid) && $sha1 && $this->storage) {
             $fileDuplications = $this->fileRepository->getFileDuplications($this->storage, $this->directory, $sha1);
-            #\TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($fileDuplications, 'FileDuplicationController:183');
             // Remove preferred file from stack
             if (!empty($fileDuplications)) {
                 unset($fileDuplications[$preferredFileUid]);
-                #\TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($fileDuplications, 'FileDuplicationController:183');
                 // Replace each duplicated file with preferred file in sys_file_reference
                 if (!empty($fileDuplications)) {
+                    // @todo: Backup sys_file_reference
+                    #$tableNameSuffix = '_bakfileduplicationsolves_' . $GLOBALS['EXEC_TIME'];
+                    #$this->updateUtility->backupDBTables(['sys_file_reference'], $tableNameSuffix);
+                    $fileReplacements = [];
                     foreach ($fileDuplications as $fileUid => $duplicat) {
                         if (intval($duplicat['usage']) > 0 && $duplicat['fileObject'] instanceof File) {
                             $fileObjectUid = $duplicat['fileObject']->getUid();
+                            $fileReplacements[$duplicat['fileObject']->getUid()] = [
+                                'fileObject' => $duplicat['fileObject']
+                            ];
                             // Get file references
-                            $fileReferences = $this->fileRepository->getFileReferences($duplicat['fileObject'], $this->storage, $this->directory);
-                            \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($fileReferences, 'FileDuplicationController:198');
+                            $sysFileReferences = $this->fileRepository->getSysFileReferences($duplicat['fileObject'], $this->storage, $this->directory);
                             // Update file reference
-                            # @todo: database update - replace uid_local with uid of preferred file uid
+                            if (!empty($sysFileReferences)) {
+                                $fileReplacements[$duplicat['fileObject']->getUid()]['sysFileReferences'] = $sysFileReferences;
+                                foreach ($sysFileReferences as $key => $sysFileReference) {
+                                    // Replace uid_local with uid of preferred file uid
+                                    $updateFieldsArray = ['uid_local' => intval($preferredFileUid)];
+                                    #$this->fileRepository->updateSysFileReference(intval($sysFileReference['uid']), $updateFieldsArray, true);
+                                }
+                            }
                             // Remove file from file system
                             # @todo: rm -f file
+                            // Delete or set file as missing in sys_file
+                            # @todo: update db sys_file table
                             // Assing results to view
-                            # @todo: $this->view->assign('filesReplacements', $filesReplacements);
+                            # @todo: $this->view->assign('fileReplacements', $fileReplacements);
                         }
+                        $fileReferences = null;
                     }
                 }
             }
         }
+        $this->view->assign('preferredFileUid', $preferredFileUid);
+        $this->view->assign('fileDuplications', $fileDuplications); // Replaced files
+        $this->view->assign('fileReplacements', $fileReplacements); // Replaced files
     }
 
     /**

@@ -1,6 +1,8 @@
 <?php
 namespace Jokumer\Xtools\Controller;
 
+use Jokumer\Xtools\Utility\UpdateUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\View\ViewInterface;
 
@@ -21,6 +23,22 @@ class AbstractController extends ActionController
      * @var array
      */
     protected $extensionConfiguration = [];
+
+    /**
+     * UpdateUtility
+     *
+     * @var UpdateUtility
+     */
+    protected $updateUtility = null;
+
+    /**
+     * AbstractController constructor
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->updateUtility = GeneralUtility::makeInstance(UpdateUtility::class);
+    }
 
     /**
      * Initialize view
