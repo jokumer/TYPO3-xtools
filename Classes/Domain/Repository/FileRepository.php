@@ -116,8 +116,9 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
                     $fileDuplications = [];
                     foreach ($rows as $key => $row) {
                         try {
-                            $fileDuplications[$key]['fileObject'] = $this->factory->getFileObject($row['uid']);
-                            $fileDuplications[$key]['usage'] = $row['sfrCount'];
+                            $fileObject = $this->factory->getFileObject($row['uid']);
+                            $fileDuplications[$key]['fileObject'] = $fileObject;
+                            $fileDuplications[$key]['usage'] = count($this->getSysFileReferences($fileObject));
                         } catch (ResourceDoesNotExistException $exception) {
                             // No handling, just omit the invalid reference uid
                         }
@@ -158,12 +159,10 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
      * Returns array of file references by file resource uid
      *
      * @param File $file
-     * @param ResourceStorage $storageUid
-     * @param string $directory
      * @param integer $limit
      * @return QueryResultInterface
      */
-    public function getSysFileReferences(File $file, $storage = null, $directory = null, $limit = 1000) {
+    public function getSysFileReferences(File $file, $limit = 1000) {
         $fileReferences = null;
         if ($file instanceof File) {
             $addWhereArray['sysFile'] = 'uid_local = ' . $file->getUid();
@@ -206,6 +205,8 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
                 if ($updateRefIndex) {
                     /** @var UpdateUtility $updateUtility */
                     $updateUtility = GeneralUtility::makeInstance(UpdateUtility::class);
+                    // @todo: ensure refIndex for sys_file_reference has been updated.
+                    // SELECT * FROM `sys_refindex` WHERE `tablename` LIKE 'sys_file_reference' AND recuid = $sysFileReferenceUid;
                     $updateUtility->updateRefIndex('sys_file_reference', intval($sysFileReferenceUid));
                 }
             } else {
@@ -221,6 +222,7 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
      * Get file object
      * 
      * @param integer $sysFileUid
+     * @return null\File $fileObject
      */
     public function getFileObject($sysFileUid = null)
     {

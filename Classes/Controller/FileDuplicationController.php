@@ -198,14 +198,15 @@ class FileDuplicationController extends AbstractController
                                 'fileObject' => $duplicat['fileObject']
                             ];
                             // Get file references
-                            $sysFileReferences = $this->fileRepository->getSysFileReferences($duplicat['fileObject'], $this->storage, $this->directory);
+                            $sysFileReferences = $this->fileRepository->getSysFileReferences($duplicat['fileObject']);
                             // Update file reference
                             if (!empty($sysFileReferences)) {
                                 $replacedFiles[$duplicat['fileObject']->getUid()]['sysFileReferences'] = $sysFileReferences;
                                 foreach ($sysFileReferences as $key => $sysFileReference) {
                                     // Replace uid_local with uid of preferred file uid
                                     $updateFieldsArray = ['uid_local' => intval($preferredFileUid)];
-                                    $this->fileRepository->updateSysFileReference(intval($sysFileReference['uid']), $updateFieldsArray, true);
+                                    $updateResult = $this->fileRepository->updateSysFileReference(intval($sysFileReference['uid']), $updateFieldsArray, true);
+                                    #if ($updateResult) {}
                                 }
                             }
                             // Remove file from file system
