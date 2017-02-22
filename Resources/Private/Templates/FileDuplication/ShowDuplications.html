@@ -82,7 +82,7 @@
 								<a href="{fileDuplication.fileFacade.publicUrl}" target="_blank" title="{fileDuplication.fileFacade.publicUrl}">
 									<f:if condition="{fileDuplication.fileFacade.type} == 2">
 										<f:image
-												src="{fileDuplication.fileFacade.publicUrl}"
+												image="{fileDuplication.fileFacade.resource}"
 												alt="{fileDuplication.fileFacade.name}"
 												treatIdAsReference="0"
 												maxWidth="64"
@@ -92,7 +92,9 @@
 								</a>
 							</f:then>
 							<f:else>
-								<span title="{fileDuplication.fileFacade.publicUrl}">NOT FOUND</span>
+								<span title="{fileDuplication.fileFacade.publicUrl}">
+									NOT FOUND
+								</span>
 							</f:else>
 						</f:if>
 					</td>
