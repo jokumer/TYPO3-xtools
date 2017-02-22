@@ -98,10 +98,13 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
             if ($sha1) {
                 $rows = $this->getDatabaseConnection()->exec_SELECTgetRows(
                     'sf.uid, sf.sha1, sf.name, count(sf.uid) sfrCount',
-                    'sys_file AS sf LEFT JOIN sys_file_reference AS sfr ON sf.uid = sfr.uid_local',
+                    'sys_file AS sf'
+                    . ' LEFT JOIN sys_file_reference AS sfr ON sf.uid = sfr.uid_local'
+                    . ' LEFT JOIN sys_file_metadata AS sfm ON sf.uid = sfm.file',
                     'sf.sha1 = ' . $this->getDatabaseConnection()->fullQuoteStr($sha1, 'sys_file') . $addWhere,
                     'sf.uid',
-                    'sfrCount DESC',
+                    // @todo: group order by meta (title, description, caption, keyword..)
+                    'sfrCount DESC, sf.name ASC, sfm.title DESC, sfm.description DESC, sfm.caption DESC, sfm.keywords DESC',
                     $limit,
                     'uid'
                 );
