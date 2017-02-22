@@ -15,5 +15,77 @@
 		<f:translate key="controller.fileDuplication.action.index"/>
 	</h2>
 	<h3>Solve duplications</h3>
-	... here to come ...
+	<f:if condition="{preferredFile}">
+		<f:then>
+			<h4>Preferred file:</h4>
+			<p>
+				<a href="{preferredFile.publicUrl}"
+				   target="_blank"
+				   title="{preferredFile.publicUrl}">
+					<f:if condition="{preferredFile.type} == 2">
+						<f:image image="{preferredFile}"
+								 alt="{preferredFile.name}"
+								 treatIdAsReference="0"
+								 maxWidth="64"
+								 maxHeight="64"
+								 style="max-height:64px; max-width:64px;"/>
+					</f:if>
+					{preferredFile.name} [{preferredFile.uid}]
+				</a>
+			</p>
+			<f:if condition="{replacedFiles}">
+				<f:then>
+					<h5>Replaced files:</h5>
+					<ul>
+						<f:for each="{replacedFiles}" as="replacedFile">
+							<li>
+								<a href="{replacedFile.fileObject.publicUrl}"
+								   target="_blank"
+								   title="{replacedFile.fileObject.publicUrl}">
+									<f:if condition="{replacedFile.fileObject.type} == 2">
+										<f:image image="{replacedFile.fileObject}"
+												 alt="{replacedFile.fileObject.name}"
+												 treatIdAsReference="0"
+												 maxWidth="64"
+												 maxHeight="64"
+												 style="max-height:64px; max-width:64px;"/>
+									</f:if>
+									{replacedFile.fileObject.name} [{replacedFile.fileObject.uid}]
+								</a>
+								<f:if condition="{replacedFile.sysFileReferences}">
+									<f:then>
+										<h6>File references</h6>
+										<ul>
+											<f:for each="{replacedFile.sysFileReferences}" as="sysFileReference">
+												<li>
+													updated ...
+													<ul>
+														<li>{sysFileReference.uid}</li>
+														<li>{sysFileReference.pid}</li>
+														<li>{sysFileReference.uid_local}</li>
+														<li>{sysFileReference.uid_foreign}</li>
+														<li>{sysFileReference.tablenames}</li>
+														<li>{sysFileReference.fieldname}</li>
+													</ul>
+												</li>
+											</f:for>
+										</ul>
+									</f:then>
+									<f:else>
+										<h6>NO FILE REFERENCES</h6>
+									</f:else>
+								</f:if>
+							</li>
+						</f:for>
+					</ul>
+				</f:then>
+				<f:else>
+					<h5>NO REPLACED FILES</h5>
+				</f:else>
+			</f:if>
+		</f:then>
+		<f:else>
+			<h4>NO PREFERRED FILE</h4>
+		</f:else>
+	</f:if>
 </f:section>

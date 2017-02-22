@@ -167,11 +167,13 @@ class FileDuplicationController extends AbstractController
      */
     public function solveDuplicationsAction()
     {
-        $fileReplacements = null;
-        // Get request
         $preferredFileUid = null;
+        $preferredFile = null;
+        $replacedFiles = null;
+        // Get request
         if ($this->request->hasArgument('preferredFileUid')) {
             $preferredFileUid = $this->request->getArgument('preferredFileUid');
+            $preferredFile = $this->fileRepository->getFileObject($preferredFileUid);
         }
         $sha1 = null;
         if ($this->request->hasArgument('sha1')) {
@@ -188,22 +190,22 @@ class FileDuplicationController extends AbstractController
                     // @todo: Backup sys_file_reference
                     #$tableNameSuffix = '_bakfileduplicationsolves_' . $GLOBALS['EXEC_TIME'];
                     #$this->updateUtility->backupDBTables(['sys_file_reference'], $tableNameSuffix);
-                    $fileReplacements = [];
+                    $replacedFiles = [];
                     foreach ($fileDuplications as $fileUid => $duplicat) {
                         if (intval($duplicat['usage']) > 0 && $duplicat['fileObject'] instanceof File) {
                             $fileObjectUid = $duplicat['fileObject']->getUid();
-                            $fileReplacements[$duplicat['fileObject']->getUid()] = [
+                            $replacedFiles[$duplicat['fileObject']->getUid()] = [
                                 'fileObject' => $duplicat['fileObject']
                             ];
                             // Get file references
                             $sysFileReferences = $this->fileRepository->getSysFileReferences($duplicat['fileObject'], $this->storage, $this->directory);
                             // Update file reference
                             if (!empty($sysFileReferences)) {
-                                $fileReplacements[$duplicat['fileObject']->getUid()]['sysFileReferences'] = $sysFileReferences;
+                                $replacedFiles[$duplicat['fileObject']->getUid()]['sysFileReferences'] = $sysFileReferences;
                                 foreach ($sysFileReferences as $key => $sysFileReference) {
                                     // Replace uid_local with uid of preferred file uid
                                     $updateFieldsArray = ['uid_local' => intval($preferredFileUid)];
-                                    #$this->fileRepository->updateSysFileReference(intval($sysFileReference['uid']), $updateFieldsArray, true);
+                                    $this->fileRepository->updateSysFileReference(intval($sysFileReference['uid']), $updateFieldsArray, true);
                                 }
                             }
                             // Remove file from file system
@@ -218,9 +220,8 @@ class FileDuplicationController extends AbstractController
                 }
             }
         }
-        $this->view->assign('preferredFileUid', $preferredFileUid);
-        $this->view->assign('fileDuplications', $fileDuplications); // Replaced files
-        $this->view->assign('fileReplacements', $fileReplacements); // Replaced files
+        $this->view->assign('preferredFile', $preferredFile);
+        $this->view->assign('replacedFiles', $replacedFiles);
     }
 
     /**

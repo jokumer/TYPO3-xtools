@@ -1,9 +1,11 @@
 <?php
 namespace Jokumer\Xtools\Domain\Repository;
 
+use Jokumer\Xtools\Utility\UpdateUtility;
 use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class FileRepository
@@ -167,7 +169,7 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
             $addWhereArray['sysFile'] = 'uid_local = ' . $file->getUid();
             $addWhere = ' AND ' . implode(' AND ', $addWhereArray);
             $rows = $this->getDatabaseConnection()->exec_SELECTgetRows(
-                'uid',
+                'uid, pid, uid_local, uid_foreign, tablenames, fieldname',
                 'sys_file_reference',
                 '1=1' . $addWhere,
                 '',
@@ -202,9 +204,10 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
             );
             if ($updateResult) {
                 if ($updateRefIndex) {
-                    $this->updateUtility->updateRefIndex('sys_file_reference', intval($sysFileReferenceUid));
+                    /** @var UpdateUtility $updateUtility */
+                    $updateUtility = GeneralUtility::makeInstance(UpdateUtility::class);
+                    $updateUtility->updateRefIndex('sys_file_reference', intval($sysFileReferenceUid));
                 }
-                $resultDebug[__FUNCTION__]['success'][] = $sysFileReferenceUid;
             } else {
                 # failed 1
             }
@@ -212,5 +215,19 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
             # failed 2
         }
         return $updateResult;
+    }
+
+    /**
+     * Get file object
+     * 
+     * @param integer $sysFileUid
+     */
+    public function getFileObject($sysFileUid = null)
+    {
+        $fileObject = null;
+        if (intval($sysFileUid)) {
+            $fileObject = $this->factory->getFileObject(intval($sysFileUid));
+        }
+        return $fileObject;
     }
 }
