@@ -1,21 +1,17 @@
 ul.f3-widget-paginator {
-    border: 1px solid #cccccc;
     width: 100%;
-    margin-top: 20px;
-    margin-bottom: 1.25em;
-    padding: 5px;
+    padding: 0;
     overflow: hidden;
     list-style-type: none;
-    background-color: #f7f7f7;
 }
 ul.f3-widget-paginator li {
     float: left;
     display: block;
     background-color: #fff;
     border: 1px solid #589edc;
-    border-radius: 2px;
+    border-radius: 0;
     color: #000;
-    margin: 0 5px 0 0;
+    margin: 0 -1px 0 0;
     padding: 5px 10px;
     line-height: normal;
 }
@@ -23,7 +19,14 @@ ul.f3-widget-paginator li.previous,
 ul.f3-widget-paginator li.next {
     background-color: #6daae0;
     border: 1px solid #589edc;
+    border-radius: 2px;
     color: #fff;
+}
+ul.f3-widget-paginator li:first-child {
+    border-radius: 2px 0 0 2px;
+}
+ul.f3-widget-paginator li:last-child {
+    border-radius: 0 2px 2px 0;
 }
 ul.f3-widget-paginator li.current {
     background-color: #dddddd;
