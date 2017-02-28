@@ -31,8 +31,7 @@ class FileDuplicationController extends AbstractController
         $this->data['list']['storages'] = $this->getAvailableStorages();
         $this->data['selection']['directory'] = ($this->storage) ? $this->getDirectoryListData($this->currentPathRoot) : null;
         $this->data['selection']['storage'] = $this->storage;
-        $this->data['path']['site'] = PATH_site;
-        $this->data['path']['current']['selected'] = $this->currentPathSelected;
+        $this->data['selection']['path'] = $this->currentPathSelected;
         $this->data['icons']['apps-filetree-folder-default'] = $this->iconFactory->getIcon('apps-filetree-folder-default', Icon::SIZE_SMALL);
         $this->data['icons']['apps-filetree-folder-opened'] = $this->iconFactory->getIcon('apps-filetree-folder-opened', Icon::SIZE_SMALL);
         $this->data['icons']['apps-filetree-folder-locked'] = $this->iconFactory->getIcon('apps-filetree-folder-locked', Icon::SIZE_SMALL);
