@@ -14,7 +14,7 @@
 			No storages found!
 		</f:else>
 	</f:if>
-	<h3>Directoy list</h3>
+	<h3>Directories</h3>
 	<f:if condition="{data.selection.storage}">
 		<f:then>
 			<f:render partial="Toolbox/DirectoryList"
@@ -76,7 +76,15 @@
 			<tr class="{f:if(condition: iterator.isEven, then: 'even', else: 'odd')}"
 				role="row">
 				<td>
-					<strong>{filesDuplication.totalCount}</strong>
+					<f:link.action action="showDuplications"
+								   controller="FileDuplication"
+								   arguments="{
+								     selection:{storage:data.selection.storage.uid, directory:data.selection.path},
+								     sha1:filesDuplication.sha1
+								   }">
+						<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-open.svg" width="16" height="16">
+						<strong>{filesDuplication.totalCount}</strong>
+					</f:link.action>
 				</td>
 				<td>
 					<f:if condition="{filesDuplication.uid}">
@@ -101,14 +109,18 @@
 					</f:if>
 				</td>
 				<td>
-					<f:link.action action="showDuplications"
-								   controller="FileDuplication"
-								   arguments="{
-								     selection:{storage:data.selection.storage.uid, directory:data.selection.path},
-								     sha1:filesDuplication.sha1
-								   }">
-						{filesDuplication.name}
-					</f:link.action>
+					<f:if condition="{filesDuplication.uid}">
+						<f:then>
+							<a href="{f:uri.image(src:filesDuplication.uid, treatIdAsReference:0)}"
+							   target="_blank"
+							   title="{f:uri.image(src:filesDuplication.uid, treatIdAsReference:0)}">
+								{filesDuplication.name}
+							</a>
+						</f:then>
+						<f:else>
+							NOT FOUND
+						</f:else>
+					</f:if>
 				</td>
 				<td>
 					{filesDuplication.type}
