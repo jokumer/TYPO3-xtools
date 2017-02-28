@@ -3,7 +3,6 @@ namespace Jokumer\Xtools\Controller;
 
 use Jokumer\Xtools\Controller\AbstractController;
 use TYPO3\CMS\Core\Imaging\Icon;
-use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -18,40 +17,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class FileAndFolderPermissionController extends AbstractController
 {
-    /**
-     * Current path absolute
-     * 
-     * @var string
-     */
-    protected $currentPathAbsolute = null;
-
-    /**
-     * Current path relative
-     *
-     * @var string
-     */
-    protected $currentPathRelative = null;
-
-    /**
-     * Current path selected
-     *
-     * @var string
-     */
-    protected $currentPathSelected = null;
-    
-    /**
-     * @var IconFactory
-     */
-    protected $iconFactory;
-
-    /**
-     * Construct
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
-    }
 
     /**
      * Index action
@@ -60,38 +25,26 @@ class FileAndFolderPermissionController extends AbstractController
      */
     public function indexAction()
     {
-        $data = [];
         $this->currentPathSelected = $this->getCurrentPathSelected();
         // Run action before getting list
         if ($this->request->hasArgument('data')) {
             $requestData = $this->request->getArgument('data');
-            if (isset($requestData['form'])) {
-                $data['action'] = $this->runAction($requestData);
+            if (is_array($requestData) && isset($requestData['form'])) {
+                $this->runAction($requestData);
             }
         }
         // Get selection
-        $data['selection'] = $this->getDirectoryListData();
-        $data['path']['site'] = PATH_site;
-        $data['path']['current']['absolute'] = $this->currentPathAbsolute;
-        $data['path']['current']['relative'] = $this->currentPathRelative;
-        $data['path']['current']['selected'] = $this->currentPathSelected;
-        $data['path']['current']['properties'] = $this->getDirectoryProperties(PATH_site, $this->currentPathSelected);
-        $data['icons']['apps-filetree-folder-default'] = $this->iconFactory->getIcon('apps-filetree-folder-default', Icon::SIZE_SMALL);
-        $data['icons']['apps-filetree-folder-opened'] = $this->iconFactory->getIcon('apps-filetree-folder-opened', Icon::SIZE_SMALL);
-        $data['targetPermissions']['fileCreateMask'] = isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['fileCreateMask']) ? $GLOBALS['TYPO3_CONF_VARS']['SYS']['fileCreateMask'] : '0644';
-        $data['targetPermissions']['folderCreateMask'] = isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['folderCreateMask']) ? $GLOBALS['TYPO3_CONF_VARS']['SYS']['folderCreateMask'] : '0755';
-        $this->view->assign('data', $data);
-    }
-
-    /**
-     * Get data
-     *
-     * @param array $data
-     * @return array $data
-     */
-    protected function getData($data)
-    {
-        return $data;
+        $this->data['selection'] = $this->getDirectoryListData();
+        $this->data['path']['site'] = PATH_site;
+        $this->data['path']['current']['absolute'] = $this->currentPathAbsolute;
+        $this->data['path']['current']['relative'] = $this->currentPathRelative;
+        $this->data['path']['current']['selected'] = $this->currentPathSelected;
+        $this->data['path']['current']['properties'] = $this->getDirectoryProperties(PATH_site, $this->currentPathSelected);
+        $this->data['icons']['apps-filetree-folder-default'] = $this->iconFactory->getIcon('apps-filetree-folder-default', Icon::SIZE_SMALL);
+        $this->data['icons']['apps-filetree-folder-opened'] = $this->iconFactory->getIcon('apps-filetree-folder-opened', Icon::SIZE_SMALL);
+        $this->data['targetPermissions']['fileCreateMask'] = isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['fileCreateMask']) ? $GLOBALS['TYPO3_CONF_VARS']['SYS']['fileCreateMask'] : '0644';
+        $this->data['targetPermissions']['folderCreateMask'] = isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['folderCreateMask']) ? $GLOBALS['TYPO3_CONF_VARS']['SYS']['folderCreateMask'] : '0755';
+        $this->view->assign('data', $this->data);
     }
 
     /**
@@ -159,7 +112,7 @@ class FileAndFolderPermissionController extends AbstractController
             }
         }
         if ($flashMessageBody) {
-            $this->addFlashMessage($flashMessageBody, $flashMessageTitle, $flashMessageSeverity);
+            $this->addFlashMessage($flashMessageBody, $flashMessageTitle);
         }
     }
 
@@ -252,40 +205,5 @@ class FileAndFolderPermissionController extends AbstractController
             $list['selection'] = $this->getDirectoryData($path, $directory);
         }
         return $list;
-    }
-
-    /**
-     * Get path relative
-     *
-     * @param string $path
-     * @return string $path
-     */
-    protected function getPathRelative($path)
-    {
-        $pos = strpos($path, PATH_site);
-        if ($pos !== false) {
-            $substring = substr($path, strlen(PATH_site));
-            if ($substring) {
-                $path = GeneralUtility::dirname($substring);
-            } else {
-                $path = '';
-            }
-        }
-        return $path;
-    }
-
-    /**
-     * Get path absolute
-     *
-     * @param string $path
-     * @return string $path
-     */
-    protected function getPathAbsolute($path)
-    {
-        $pos = strpos($path, PATH_site);
-        if ($pos === false) {
-            $path = PATH_site . $path;
-        }
-        return $path;
     }
 }

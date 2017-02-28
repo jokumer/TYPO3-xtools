@@ -19,7 +19,7 @@
 						<f:else>
 							{icons.apps-filetree-folder-default}
 							<f:link.action arguments="{selection:{path:list.path, directory:directory.name}}">
-								<b>{directory.name}</b>
+								{directory.name}
 							</f:link.action>
 							<i style="color: grey;">
 								[ <f:render partial="Toolbox/FileAndFolderPermission/DirectoryProperties"
