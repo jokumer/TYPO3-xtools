@@ -9,11 +9,23 @@
 	<f:if condition="{data.list.storages}">
 		<f:then>
 			<f:render partial="Toolbox/FileDuplication/StorageList" arguments="{_all}"/>
+			<f:if condition="{data.selection.storage}">
+				<f:then>
+					<f:render section="directories" arguments="{_all}"/>
+					<f:render section="filesDuplications" arguments="{_all}"/>
+				</f:then>
+				<f:else>
+					Select a storage above to find duplications.
+				</f:else>
+			</f:if>
 		</f:then>
 		<f:else>
 			No storages found!
 		</f:else>
 	</f:if>
+</f:section>
+
+<f:section name="directories">
 	<h3>Directories</h3>
 	<f:if condition="{data.selection.storage}">
 		<f:then>
@@ -24,6 +36,9 @@
 			No directories found! Please select a storage.
 		</f:else>
 	</f:if>
+</f:section>
+
+<f:section name="filesDuplications">
 	<h3>Files and duplications</h3>
 	<f:if condition="{filesDuplications}">
 		<f:then>
@@ -35,15 +50,16 @@
 					<f:widget.paginate objects="{filesDuplications}"
 									   as="results"
 									   configuration="{
+									     maximumNumberOfLinks: 20,
 									     itemsPerPage: '{extensionConfiguration.pagination_itemsPerPage}',
 									     insertAbove: 1,
 									     insertBelow: 1
 									   }">
-						<f:render section="list" arguments="{results:results, data:data}"/>
+						<f:render section="list_filesDuplication" arguments="{results:results, data:data}"/>
 					</f:widget.paginate>
 				</f:then>
 				<f:else>
-					<f:render section="list" arguments="{results:filesDuplications, data:data}"/>
+					<f:render section="list_filesDuplication" arguments="{results:filesDuplications, data:data}"/>
 				</f:else>
 			</f:if>
 		</f:then>
@@ -59,7 +75,7 @@
 	</f:if>
 </f:section>
 
-<f:section name="list">
+<f:section name="list_filesDuplication">
 	<table class="t3-table t3-datatable">
 		<theader>
 			<tr>

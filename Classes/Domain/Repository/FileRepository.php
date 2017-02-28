@@ -53,7 +53,7 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
      * @param integer $limit
      * @return QueryResultInterface
      */
-    public function getFilesDuplications($storage = null, $directory = null, $limit = 1000) {
+    public function getFilesDuplications($storage = null, $directory = null, $limit = 10000) {
         $filesDuplications = null;
         if ($storage instanceof ResourceStorage) {
             $addWhereArray['storage'] = 'storage = ' . $storage->getUid();
@@ -89,7 +89,7 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
      * @param integer $limit
      * @return QueryResultInterface
      */
-    public function getFileDuplications($storage = null, $directory = null, $sha1 = '', $limit = 1000) {
+    public function getFileDuplications($storage = null, $directory = null, $sha1 = '', $limit = 10000) {
         $fileDuplications = null;
         if ($storage instanceof ResourceStorage) {
             $addWhereArray['storage'] = 'sf.storage = ' . $storage->getUid();
@@ -162,7 +162,7 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
      * @param integer $limit
      * @return QueryResultInterface
      */
-    public function getSysFileReferences(File $file, $limit = 1000) {
+    public function getSysFileReferences(File $file, $limit = 10000) {
         $fileReferences = null;
         if ($file instanceof File) {
             $addWhereArray['sysFile'] = 'uid_local = ' . $file->getUid();
