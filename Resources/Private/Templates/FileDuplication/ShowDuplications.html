@@ -7,7 +7,7 @@
 	<f:link.action
 			controller="FileDuplication"
 			action="index"
-			arguments="{selection:{storage:data.selection.storage.uid, directory:data.selection.directory}}"
+			arguments="{selection:{storage:data.selection.storage.uid, directory:data.selection.directory.selection.directory}}"
 			class="btn btn-sm btn-info">
 		Back to index
 	</f:link.action>
@@ -21,8 +21,8 @@
 				<f:if condition="{data.selection.storage}">
 					Storage [uid]: {data.selection.storage.name} [{data.selection.storage.uid}]<br/>
 				</f:if>
-				<f:if condition="{data.selection.directory}">
-					Directory: {data.selection.directory}<br/>
+				<f:if condition="{data.selection.directory.selection.directory}">
+					Directory: {data.selection.directory.selection.directory}<br/>
 				</f:if>
 				Files sha1: {fileDuplications.0.fileFacade.sha1}<br/>
 				Files count: <f:count subject="{fileDuplications}"/><br/>
@@ -56,7 +56,7 @@
 <f:section name="list">
 	<f:form action="solveDuplications" controller="FileDuplication">
 		<f:form.hidden name="selection[storage]" value="{data.selection.storage.uid}"/>
-		<f:form.hidden name="selection[directory]" value="{data.selection.directory}"/>
+		<f:form.hidden name="selection[directory]" value="{data.selection.directory.selection.directory}"/>
 		<table class="t3-table t3-datatable">
 			<theader>
 				<tr>

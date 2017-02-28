@@ -48,7 +48,7 @@ class FileDuplicationController extends AbstractController
         // Assign data
         $this->view->assign('data', $this->data);
         // Assign files duplications
-        $filesDuplications = $this->fileRepository->getFilesDuplications($this->storage, $this->directory);
+        $filesDuplications = $this->fileRepository->getFilesDuplications($this->storage, $this->currentPathSelected);
         $this->view->assign('filesDuplications', $filesDuplications);
     }
 
@@ -64,7 +64,7 @@ class FileDuplicationController extends AbstractController
         // Assign file duplications
         if ($this->request->hasArgument('sha1')) {
             $sha1 = $this->request->getArgument('sha1');
-            $fileDuplications = $this->fileRepository->getFileDuplications($this->storage, $this->directory, $sha1);
+            $fileDuplications = $this->fileRepository->getFileDuplications($this->storage, $this->currentPathSelected, $sha1);
             if (!empty($fileDuplications)) {
                 // Assign fileDuplicationsArray use FileFacade, add references count
                 $count = 0;
@@ -100,7 +100,7 @@ class FileDuplicationController extends AbstractController
         }
         // Get concerning file duplications
         if (intval($preferredFileUid) && $sha1 && $this->storage) {
-            $fileDuplications = $this->fileRepository->getFileDuplications($this->storage, $this->directory, $sha1);
+            $fileDuplications = $this->fileRepository->getFileDuplications($this->storage, $this->currentPathSelected, $sha1);
             // Remove preferred file from stack
             if (!empty($fileDuplications)) {
                 unset($fileDuplications[$preferredFileUid]);

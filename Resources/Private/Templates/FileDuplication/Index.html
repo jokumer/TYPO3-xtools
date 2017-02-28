@@ -104,7 +104,7 @@
 					<f:link.action action="showDuplications"
 								   controller="FileDuplication"
 								   arguments="{
-								     selection:{storage:data.selection.storage.uid, directory:data.selection.directory},
+								     selection:{storage:data.selection.storage.uid, directory:data.selection.directory.selection.directory},
 								     sha1:filesDuplication.sha1
 								   }">
 						{filesDuplication.name}

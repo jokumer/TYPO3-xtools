@@ -62,13 +62,6 @@ class AbstractController extends ActionController
     protected $storage = null;
 
     /**
-     * Directory, current selected
-     *
-     * @var string $directory
-     */
-    protected $directory = null;
-
-    /**
      * Available storages
      *
      * @var array $availableStorages
@@ -172,9 +165,6 @@ class AbstractController extends ActionController
                 }
             } else {
                 $currentPathRoot = '';
-            }
-            if ($selection['directory']) {
-                $this->setDirectory($selection['directory']);
             }
         }
         if (substr($currentPathRoot, -1) != '/') {
@@ -364,29 +354,6 @@ class AbstractController extends ActionController
     protected function getStorage()
     {
         return $this->storage;
-    }
-
-    /**
-     * Set directory
-     *
-     * @param string $directory
-     * @return void
-     */
-    protected function setDirectory($directory)
-    {
-        if ($directory) {
-            $this->directory = $directory;
-        }
-    }
-
-    /**
-     * Get directory
-     *
-     * @return string
-     */
-    protected function getDirectory()
-    {
-        return $this->directory;
     }
 
     /**
