@@ -148,11 +148,11 @@ class FileDuplicationController extends AbstractController
             $sha1 = $this->request->getArgument('sha1');
             $fileDuplications = $this->fileRepository->getFileDuplications($this->storage, $this->directory, $sha1);
             if (!empty($fileDuplications)) {
-                // Assign fileDuplicationsArray use FileFacade, add usage count
+                // Assign fileDuplicationsArray use FileFacade, add references count
                 $count = 0;
                 foreach ($fileDuplications as $key => $fileDuplication) {
                     $fileDuplicationsArray[$count]['fileFacade'] = new FileFacade($fileDuplication['fileObject']);
-                    $fileDuplicationsArray[$count]['usage'] = $fileDuplication['usage'];
+                    $fileDuplicationsArray[$count]['references'] = $fileDuplication['references'];
                     $count++;
                 }
                 $this->view->assign('fileDuplications', $fileDuplicationsArray);
@@ -187,13 +187,12 @@ class FileDuplicationController extends AbstractController
                 unset($fileDuplications[$preferredFileUid]);
                 // Replace each duplicated file with preferred file in sys_file_reference
                 if (!empty($fileDuplications)) {
-                    // @todo: Backup sys_file_reference
+                    // @todo: Backup sys_file and sys_file_reference
                     #$tableNameSuffix = '_bakfileduplicationsolves_' . $GLOBALS['EXEC_TIME'];
-                    #$this->updateUtility->backupDBTables(['sys_file_reference'], $tableNameSuffix);
+                    #$this->updateUtility->backupDBTables(['sys_file', 'sys_file_reference'], $tableNameSuffix);
                     $replacedFiles = [];
                     foreach ($fileDuplications as $fileUid => $duplicat) {
-                        if (intval($duplicat['usage']) > 0 && $duplicat['fileObject'] instanceof File) {
-                            $fileObjectUid = $duplicat['fileObject']->getUid();
+                        if (intval($duplicat['references']) > 0 && $duplicat['fileObject'] instanceof File) {
                             $replacedFiles[$duplicat['fileObject']->getUid()] = [
                                 'fileObject' => $duplicat['fileObject']
                             ];

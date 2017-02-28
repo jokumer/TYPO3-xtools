@@ -64,7 +64,7 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
             $addWhereArray['missing'] = '(missing = 0)';
             $addWhere = ' AND ' . implode(' AND ', $addWhereArray);
             $rows = $this->getDatabaseConnection()->exec_SELECTgetRows(
-                'uid, sha1, name, type, count(uid) totalCount',
+                'uid, sha1, name, type, size, count(uid) totalCount',
                 'sys_file',
                 '1=1' . $addWhere,
                 'sha1 HAVING COUNT(uid) >= 2',
@@ -118,7 +118,7 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
                         try {
                             $fileObject = $this->factory->getFileObject($row['uid']);
                             $fileDuplications[$key]['fileObject'] = $fileObject;
-                            $fileDuplications[$key]['usage'] = count($this->getSysFileReferences($fileObject));
+                            $fileDuplications[$key]['references'] = count($this->getSysFileReferences($fileObject));
                         } catch (ResourceDoesNotExistException $exception) {
                             // No handling, just omit the invalid reference uid
                         }

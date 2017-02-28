@@ -58,6 +58,7 @@
 				<th>File (first found)</th>
 				<th>Type</th>
 				<th>Sha1</th>
+				<th>Size</th>
 			</tr>
 		</theader>
 		<tbody>
@@ -104,6 +105,10 @@
 				</td>
 				<td>
 					<em>{filesDuplication.sha1}</em>
+				</td>
+				<td>
+					File size: {filesDuplication.size -> f:format.bytes()} <br/>
+					Reduction: {f:cObject(typoscriptObjectPath:'lib.tx_xtools.math', data:'({filesDuplication.totalCount}-1)*{filesDuplication.size}') -> f:format.bytes()}
 				</td>
 			</tr>
 		</f:for>
