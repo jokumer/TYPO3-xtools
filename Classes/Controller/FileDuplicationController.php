@@ -1,7 +1,7 @@
 <?php
 namespace Jokumer\Xtools\Controller;
 
-use Jokumer\Xtools\Controller\AbstractController;
+use Jokumer\Xtools\Controller\AbstractFileController;
 use Jokumer\Xtools\Domain\Repository\FileRepository;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Imaging\Icon;
@@ -17,7 +17,7 @@ use TYPO3\CMS\Filelist\FileFacade;
  * @copyright Copyright belongs to the respective authors
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FileDuplicationController extends AbstractController
+class FileDuplicationController extends AbstractFileController
 {
     /**
      * Initialize action

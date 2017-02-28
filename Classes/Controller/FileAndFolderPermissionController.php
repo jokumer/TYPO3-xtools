@@ -1,7 +1,7 @@
 <?php
 namespace Jokumer\Xtools\Controller;
 
-use Jokumer\Xtools\Controller\AbstractController;
+use Jokumer\Xtools\Controller\AbstractFileController;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -15,7 +15,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * @copyright Copyright belongs to the respective authors
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FileAndFolderPermissionController extends AbstractController
+class FileAndFolderPermissionController extends AbstractFileController
 {
     /**
      * Initialize action
