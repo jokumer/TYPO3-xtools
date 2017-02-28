@@ -14,6 +14,16 @@
 			No storages found!
 		</f:else>
 	</f:if>
+	<h3>Directoy list</h3>
+	<f:if condition="{data.selection.storage}">
+		<f:then>
+			<f:render partial="Toolbox/DirectoryList"
+					  arguments="{storage:data.selection.storage, list:data.selection.directory, icons:data.icons}"/>
+		</f:then>
+		<f:else>
+			No directories found! Please select a storage.
+		</f:else>
+	</f:if>
 	<h3>Files and duplications</h3>
 	<f:if condition="{filesDuplications}">
 		<f:then>

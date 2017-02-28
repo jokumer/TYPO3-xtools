@@ -27,24 +27,12 @@ class FileDuplicationController extends AbstractController
     protected function initializeAction()
     {
         parent::initializeAction();
-        // Set available storages
-        $this->setAvailableStorages();
-        // Set selection
-        if ($this->request->hasArgument('selection')) {
-            $selection = $this->request->getArgument('selection');
-            if (intval($selection['storage'])) {
-                $this->setStorage(intval($selection['storage']));
-                $this->setAvailableDirectories();
-            }
-            if ($selection['directory']) {
-                $this->setDirectory($selection['directory']);
-            }
-        }
         // Set additional data
         $this->data['list']['storages'] = $this->getAvailableStorages();
-        $this->data['list']['directories'] = $this->getAvailableDirectories();
+        $this->data['selection']['directory'] = ($this->storage) ? $this->getDirectoryListData($this->currentPathRoot) : null;
         $this->data['selection']['storage'] = $this->storage;
-        $this->data['selection']['directory'] = $this->directory;
+        $this->data['path']['site'] = PATH_site;
+        $this->data['path']['current']['selected'] = $this->currentPathSelected;
         $this->data['icons']['apps-filetree-folder-default'] = $this->iconFactory->getIcon('apps-filetree-folder-default', Icon::SIZE_SMALL);
         $this->data['icons']['apps-filetree-folder-opened'] = $this->iconFactory->getIcon('apps-filetree-folder-opened', Icon::SIZE_SMALL);
         $this->data['icons']['apps-filetree-folder-locked'] = $this->iconFactory->getIcon('apps-filetree-folder-locked', Icon::SIZE_SMALL);

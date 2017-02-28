@@ -76,25 +76,11 @@ class AbstractController extends ActionController
     protected $availableStorages = [];
 
     /**
-     * Available directories
-     *
-     * @var array $availableDirectories
-     */
-    protected $availableDirectories = [];
-
-    /**
-     * Current path absolute
+     * Current path root
      *
      * @var string
      */
-    protected $currentPathAbsolute = null;
-
-    /**
-     * Current path relative
-     *
-     * @var string
-     */
-    protected $currentPathRelative = null;
+    protected $currentPathRoot = null;
 
     /**
      * Current path selected
@@ -139,6 +125,16 @@ class AbstractController extends ActionController
     }
 
     /**
+     * Initialize extension configuration
+     *
+     * @return void
+     */
+    protected function initializeExtensionConfiguration()
+    {
+        $this->extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['xtools']);
+    }
+
+    /**
      * Initialize view
      *
      * @param ViewInterface $view
@@ -156,13 +152,153 @@ class AbstractController extends ActionController
     }
 
     /**
-     * Initialize extension configuration
+     * Initialize action
      *
      * @return void
      */
-    protected function initializeExtensionConfiguration()
+    protected function initializeAction()
     {
-        $this->extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['xtools']);
+        parent::initializeAction();
+        // Set current path's by selection
+        if ($this->request->hasArgument('selection')) {
+            $selection = $this->request->getArgument('selection');
+            if (intval($selection['storage'])) {
+                $this->setStorage(intval($selection['storage']));
+                $storageConfiguration = $this->storage->getConfiguration();
+                if (isset($storageConfiguration['basePath'])) {
+                    $currentPathRoot = $storageConfiguration['basePath'];
+                } else {
+                    $currentPathRoot = '';
+                }
+            } else {
+                $currentPathRoot = '';
+            }
+            if ($selection['directory']) {
+                $this->setDirectory($selection['directory']);
+            }
+        }
+        if (substr($currentPathRoot, -1) != '/') {
+            $currentPathRoot .= '/';
+        }
+        $this->currentPathRoot = $this->getPathRelative($currentPathRoot);
+        $this->currentPathSelected = $this->getCurrentPathSelected();
+    }
+
+    /**
+     * Get current path selected
+     *
+     * @return array $currentPathSelected
+     */
+    protected function getCurrentPathSelected()
+    {
+        $currentPathSelected = null;
+        // Submitted via form
+        if ($this->request->hasArgument('data')) {
+            $requestData = $this->request->getArgument('data');
+            if (isset($requestData['form']['pathSelected']) && $requestData['form']['pathSelected'] !== '') {
+                $pathSubmitted = $requestData['form']['pathSelected'];
+                if (@is_dir($this->getPathAbsolute($pathSubmitted))) {
+                    $currentPathSelected = $pathSubmitted;
+                }
+            }
+        }
+        // Selected via link
+        if ($this->request->hasArgument('selection')) {
+            $selection = $this->request->getArgument('selection');
+            $pathSelected = $selection['path'] . $selection['directory'];
+            $isDir = $this->currentPathRoot . $pathSelected;
+            if (@is_dir($this->getPathAbsolute($isDir))) {
+                $currentPathSelected = $pathSelected;
+            }
+        }
+        return $currentPathSelected;
+    }
+
+    /**
+     * Get directory list data
+     * Includes subdirectories by selections
+     *
+     * @param string $path
+     * @return array $directoryListData
+     */
+    protected function getDirectoryListData($path = null)
+    {
+        $relativePath = $this->getPathRelative($path);
+        $directoryListData = $this->getDirectoryData($relativePath, '');
+        // Get selection
+        if ($this->currentPathSelected) {
+            $selectedLevels = GeneralUtility::trimExplode('/', $this->currentPathSelected);
+            if (!empty($selectedLevels)) {
+                foreach ($selectedLevels as $selectedLevelKey => $selectedLevelDirectory) {
+                    $relativePath .= $selectedLevelDirectory . '/';
+                    $directoryListData = $this->addListSelection($directoryListData, $relativePath, $selectedLevelDirectory);
+                }
+            }
+        }
+        return $directoryListData;
+    }
+
+    /**
+     * Get directory data
+     *
+     * @param string $path
+     * @param string $directoryName
+     * @return array $directoryData
+     */
+    protected function getDirectoryData($path, $directoryName)
+    {
+        $absolutePath = $this->getPathAbsolute($path);
+        $relativePath = $this->getPathRelative($path);
+        $directories = GeneralUtility::get_dirs($absolutePath);
+        if (is_array($directories) && !empty($directories)) {
+            $directoriesData = [];
+            foreach ($directories as $key => $val) {
+                $directoriesData[$key] = $this->getDirectoryProperties($absolutePath, $val);
+            }
+        } else {
+            $directoriesData = false;
+        }
+        return [
+            'path' => $substring = substr($relativePath, strlen($this->currentPathRoot)),
+            'directory' => $directoryName,
+            'directories' => $directoriesData
+        ];
+    }
+
+    /**
+     * Get directory properties
+     *
+     * @param string $path
+     * @param string $directory
+     * @return array $details
+     */
+    protected function getDirectoryProperties($absolutePath, $directory)
+    {
+        $directoryProperties = [];
+        $directoryProperties['name'] = $directory;
+        $directoryProperties['ownerId'] = fileowner($absolutePath . $directory);
+        $directoryProperties['groupId'] = filegroup($absolutePath . $directory);
+        $directoryProperties['permissions'] = substr(sprintf('%o', fileperms($absolutePath . $directory)), -4);
+        return $directoryProperties;
+    }
+
+    /**
+     * Add list selection
+     *
+     * @param array $list
+     * @param string $path
+     * @param string $directory
+     * @return array $list
+     */
+    protected function addListSelection($list, $path, $directory)
+    {
+        // Append directory data to last added selection
+        if (isset($list['selection'])) {
+            $list['selection'] = $this->addListSelection($list['selection'], $path, $directory);
+        } else {
+            $list['selection'] = $this->getDirectoryData($path, $directory);
+        }
+        return $list;
     }
 
     /**
@@ -193,9 +329,16 @@ class AbstractController extends ActionController
      */
     protected function getPathAbsolute($path)
     {
-        $pos = strpos($path, PATH_site);
-        if ($pos === false) {
+        $pos1 = strpos($path, $this->currentPathRoot);
+        if ($pos1 === false) {
+            $path = $this->currentPathRoot . $path;
+        }
+        $pos2 = strpos($path, PATH_site);
+        if ($pos2 === false) {
             $path = PATH_site . $path;
+        }
+        if (substr($path, -1) != '/') {
+            $path .= '/';
         }
         return $path;
     }
@@ -247,45 +390,13 @@ class AbstractController extends ActionController
     }
 
     /**
-     * Set available storages
-     *
-     * @return void
-     */
-    protected function setAvailableStorages()
-    {
-        $this->availableStorages = $this->fileRepository->getStorages();
-    }
-
-    /**
      * Get available storages
      *
      * @return array
      */
     protected function getAvailableStorages()
     {
-        return $this->availableStorages;
-    }
-
-    /**
-     * Set available directories
-     *
-     * @return void
-     */
-    protected function setAvailableDirectories()
-    {
-        if ($this->storage){
-            $this->availableDirectories = $this->storage->getFolderIdentifiersInFolder('');
-        }
-    }
-
-    /**
-     * Get available directories
-     *
-     * @return array
-     */
-    protected function getAvailableDirectories()
-    {
-        return $this->availableDirectories;
+        return $this->fileRepository->getStorages();
     }
 
     /**

@@ -17,7 +17,16 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class FileAndFolderPermissionController extends AbstractController
 {
-
+    /**
+     * Initialize action
+     *
+     * @return void
+     */
+    protected function initializeAction()
+    {
+        parent::initializeAction();
+    }
+    
     /**
      * Index action
      *
@@ -25,7 +34,6 @@ class FileAndFolderPermissionController extends AbstractController
      */
     public function indexAction()
     {
-        $this->currentPathSelected = $this->getCurrentPathSelected();
         // Run action before getting list
         if ($this->request->hasArgument('data')) {
             $requestData = $this->request->getArgument('data');
@@ -34,10 +42,8 @@ class FileAndFolderPermissionController extends AbstractController
             }
         }
         // Get selection
-        $this->data['selection'] = $this->getDirectoryListData();
+        $this->data['selection']['directory'] = $this->getDirectoryListData($this->currentPathRoot);
         $this->data['path']['site'] = PATH_site;
-        $this->data['path']['current']['absolute'] = $this->currentPathAbsolute;
-        $this->data['path']['current']['relative'] = $this->currentPathRelative;
         $this->data['path']['current']['selected'] = $this->currentPathSelected;
         $this->data['path']['current']['properties'] = $this->getDirectoryProperties(PATH_site, $this->currentPathSelected);
         $this->data['icons']['apps-filetree-folder-default'] = $this->iconFactory->getIcon('apps-filetree-folder-default', Icon::SIZE_SMALL);
@@ -48,41 +54,12 @@ class FileAndFolderPermissionController extends AbstractController
     }
 
     /**
-     * Get current path selected
-     *
-     * @return array $currentPathSelected
-     */
-    protected function getCurrentPathSelected()
-    {
-        $currentPathSelected = null;
-        // Submitted via form
-        if ($this->request->hasArgument('data')) {
-            $requestData = $this->request->getArgument('data');
-            if (isset($requestData['form']['pathSelected']) && $requestData['form']['pathSelected'] !== '') {
-                $pathSubmitted = $requestData['form']['pathSelected'];
-                if (@is_dir($this->getPathAbsolute($pathSubmitted))) {
-                    $currentPathSelected = $pathSubmitted;
-                }
-            }
-        }
-        // Selected via link
-        if ($this->request->hasArgument('selection')) {
-            $selection = $this->request->getArgument('selection');
-            $pathSelected = $selection['path'] . $selection['directory'];
-            if (@is_dir($this->getPathAbsolute($pathSelected))) {
-                $currentPathSelected = $pathSelected;
-            }
-        }
-        return $currentPathSelected;
-    }
-
-    /**
      * Run action
      *
      * @param array $requestData
      * @return void
      */
-    protected function runAction($requestData)
+    private function runAction($requestData)
     {
         $flashMessageBody = null;
         $flashMessageTitle = 'FileAndFolderPermissionAction';
@@ -114,96 +91,5 @@ class FileAndFolderPermissionController extends AbstractController
         if ($flashMessageBody) {
             $this->addFlashMessage($flashMessageBody, $flashMessageTitle);
         }
-    }
-
-    /**
-     * Get directory list data
-     * Includes subdirectories by selections
-     *
-     * @return array $directoryListData
-     */
-    protected function getDirectoryListData()
-    {
-        $directoryListData = $this->getDirectoryData($this->currentPathRelative, '');
-        // Get selection
-        $selectedPath = $this->currentPathSelected;
-        if ($this->request->hasArgument('selection')) {
-            $selection = $this->request->getArgument('selection');
-            $selectedPath = $selection['path'] . $selection['directory'];
-        }
-        if ($selectedPath) {
-            $selectedLevels = GeneralUtility::trimExplode('/', $selectedPath);
-            if (!empty($selectedLevels)) {
-                foreach ($selectedLevels as $selectedLevelKey => $selectedLevelDirectory) {
-                    $this->currentPathRelative .= $selectedLevelDirectory . '/';
-                    $directoryListData = $this->addListSelection($directoryListData, $this->currentPathRelative, $selectedLevelDirectory);
-                }
-                $this->currentPathAbsolute = $this->getPathAbsolute($this->currentPathRelative);
-            }
-        }
-        return $directoryListData;
-    }
-
-    /**
-     * Get directory data
-     * 
-     * @param string $path
-     * @param string $directoryName
-     * @return array $directoryData
-     */
-    protected function getDirectoryData($path, $directoryName)
-    {
-        $absolutePath = $this->getPathAbsolute($path);
-        $relativePath = $this->getPathRelative($path);
-        $directories = GeneralUtility::get_dirs($absolutePath);
-        if (is_array($directories) && !empty($directories)) {
-            $directoriesData = [];
-            foreach ($directories as $key => $val) {
-                $directoriesData[$key] = $this->getDirectoryProperties($absolutePath, $val);
-            }
-        } else {
-            $directoriesData = false;
-        }
-        return [
-            'path' => $relativePath,
-            'directory' => $directoryName,
-            'directories' => $directoriesData
-        ];
-    }
-
-    /**
-     * Get directory properties
-     *
-     * @param string $path
-     * @param string $directory
-     * @return array $details
-     */
-    protected function getDirectoryProperties($absolutePath, $directory)
-    {
-        $directoryProperties = [];
-        $directoryProperties['name'] = $directory;
-        $directoryProperties['ownerId'] = fileowner($absolutePath . $directory);
-        $directoryProperties['groupId'] = filegroup($absolutePath . $directory);
-        $directoryProperties['permissions'] = substr(sprintf('%o', fileperms($absolutePath . $directory)), -4);
-        return $directoryProperties;
-    }
-
-    /**
-     * Add list selection
-     *
-     * @param array $list
-     * @param string $path
-     * @param string $directory
-     * @return array $list
-     */
-    protected function addListSelection($list, $path, $directory)
-    {
-        // Append directory data to last added selection
-        if (isset($list['selection'])) {
-            $list['selection'] = $this->addListSelection($list['selection'], $path, $directory);
-        } else {
-            $list['selection'] = $this->getDirectoryData($path, $directory);
-        }
-        return $list;
     }
 }

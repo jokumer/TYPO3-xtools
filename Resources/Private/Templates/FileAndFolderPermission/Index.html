@@ -16,7 +16,7 @@
 						{data.path.site}<b>{data.path.current.selected}</b>
 						<br/>
 						<b>Properties:</b>
-						<f:render partial="Toolbox/FileAndFolderPermission/DirectoryProperties"
+						<f:render partial="Toolbox/DirectoryProperties"
 							arguments="{directory:data.path.current.properties}"/>
 						<br/>
 						<div class="input-group">
@@ -69,7 +69,7 @@
 	</p>
 	<h3>Directoy list</h3>
 	<p>
-		<f:render partial="Toolbox/FileAndFolderPermission/DirectoryList"
-				  arguments="{list:data.selection, icons:data.icons}"/>
+		<f:render partial="Toolbox/DirectoryList"
+				  arguments="{list:data.selection.directory, icons:data.icons, showDirectoryProperties: 1}"/>
 	</p>
 </f:section>
