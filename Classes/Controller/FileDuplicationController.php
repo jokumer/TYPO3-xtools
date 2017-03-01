@@ -85,9 +85,11 @@ class FileDuplicationController extends AbstractFileController
      */
     public function solveDuplicationsAction()
     {
+        $executionTime = $GLOBALS['EXEC_TIME'];
         $preferredFileUid = null;
         $preferredFile = null;
         $replacedFiles = null;
+        $replacedFileReferences = null;
         // Get request
         if ($this->request->hasArgument('preferredFileUid')) {
             $preferredFileUid = $this->request->getArgument('preferredFileUid');
@@ -108,41 +110,60 @@ class FileDuplicationController extends AbstractFileController
                     // @todo: Backup sys_file and sys_file_reference
                     #$tableNameSuffix = '_bakfileduplicationsolves_' . $GLOBALS['EXEC_TIME'];
                     #$this->updateUtility->backupDBTables(['sys_file', 'sys_file_reference'], $tableNameSuffix);
-                    $replacedFiles = [];
-                    foreach ($fileDuplications as $fileUid => $duplicat) {
-                        if (intval($duplicat['references']) > 0 && $duplicat['fileObject'] instanceof File) {
-                            /** @var File $fileObject */
-                            $fileObject = $duplicat['fileObject'];
-                            $replacedFiles[$fileObject->getUid()] = [
-                                'fileObject' => $duplicat['fileObject']
-                            ];
-                            // Get file references
-                            $sysFileReferences = $this->fileRepository->getSysFileReferences($duplicat['fileObject']);
-                            // Update file reference
-                            if (!empty($sysFileReferences)) {
-                                $replacedFiles[$fileObject->getUid()]['sysFileReferences'] = $sysFileReferences;
-                                foreach ($sysFileReferences as $key => $sysFileReference) {
-                                    // Replace uid_local with uid of preferred file uid
-                                    $updateFieldsArray = ['uid_local' => intval($preferredFileUid)];
-                                    $updateResult = $this->fileRepository->updateSysFileReference(intval($sysFileReference['uid']), $updateFieldsArray, true);
-                                    #if ($updateResult) {}
+                    $replacedFilesTargetPath = PATH_site . 'typo3temp/tx_xtools/' . $executionTime . '/';
+                    $mkdir = GeneralUtility::mkdir_deep($replacedFilesTargetPath);
+                    if ($mkdir !== false) {
+                        $replacedFiles = [];
+                        foreach ($fileDuplications as $fileUid => $duplicat) {
+                            if ($duplicat['fileObject'] instanceof File) {
+                                /** @var File $fileObject */
+                                $fileObject = $duplicat['fileObject'];
+                                if (intval($duplicat['references']) > 0) {
+                                    // Get file references
+                                    $sysFileReferences = $this->fileRepository->getSysFileReferences($duplicat['fileObject']);
+                                    // Update file reference
+                                    if (!empty($sysFileReferences)) {
+                                        $replacedFiles[$fileObject->getUid()]['sysFileReferences'] = $sysFileReferences;
+                                        $replacedFileReferences = [];
+                                        foreach ($sysFileReferences as $key => $sysFileReference) {
+                                            // Replace uid_local with uid of preferred file uid
+                                            $updateFieldsArray = ['uid_local' => intval($preferredFileUid)];
+                                            $updateResult = $this->fileRepository->updateSysFileReference(intval($sysFileReference['uid']), $updateFieldsArray, true);
+                                            if ($updateResult) {
+                                                $replacedFileReferences[$sysFileReference->getUid] = $sysFileReference;
+                                            }
+                                        }
+                                    }
                                 }
+                                // Remove file from file system
+                                $target = $replacedFilesTargetPath . $fileObject->getName();
+                                $source = $this->getPathAbsolute($this->currentPathRoot . $fileObject->getIdentifier());
+                                $this->updateUtility->moveFile($source, $target);
+                                $replacedFiles[$fileObject->getUid()] = $fileObject->getIdentifier();
+                                // Delete or set file as missing in sys_file
+                                # @todo: update db sys_file table
                             }
-                            // Remove file from file system
-                            # @todo: rm -f file
-                            // Delete or set file as missing in sys_file
-                            # @todo: update db sys_file table
-                            // Assing results to view
-                            # @todo: $this->view->assign('fileReplacements', $fileReplacements);
                         }
-                        $fileReferences = null;
                     }
                 }
             }
         }
+        // Log
+        $logMessageArray = [
+            'storage' => $this->storage,
+            'currentPathRoot' => $this->currentPathRoot,
+            'preferredFileUid' => $preferredFileUid,
+            'replacedFiles' => serialize($replacedFiles),
+            'replacedFilesTargetPath' => $replacedFilesTargetPath,
+            'replacedFileReferences' => []
+        ];
+        $this->updateUtility->logMessage(serialize($logMessageArray));
         // Assign data
         $this->view->assign('data', $this->data);
         $this->view->assign('preferredFile', $preferredFile);
         $this->view->assign('replacedFiles', $replacedFiles);
+        $this->view->assign('replacedFileReferences', $replacedFileReferences);
+        $this->view->assign('executionTime', $executionTime);
+        $this->view->assign('replacedFilesTargetPath', $replacedFilesTargetPath);
     }
 }

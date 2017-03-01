@@ -714,4 +714,34 @@ class UpdateUtility
             }
         }
     }
+
+    /**
+     * Moves a file
+     *
+     * @param string $source
+     * @param string $target
+     * @return string
+     * @throws \RuntimeException
+     */
+    public function moveFile($source, $target)
+    {
+        $result = rename($source, $target);
+        if ($result === false) {
+            throw new \RuntimeException('Moving file ' . $sourcePath . ' to ' . $targetIdentifier . ' failed.', 1488329692);
+        }
+        return $target;
+    }
+
+    /**
+     * Log message
+     * Write sys_log using \TYPO3\CMS\Core\Utility\GeneralUtility::sysLog
+     *
+     * @param string $message
+     * @return void
+     */
+    public function logMessage($message = null) {
+        if ($message !== null) {
+            $GLOBALS['BE_USER']->simplelog($message, 'tx_xtools', 0);
+        }
+    }
 }

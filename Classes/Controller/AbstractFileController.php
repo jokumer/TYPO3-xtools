@@ -277,9 +277,8 @@ class AbstractFileController extends AbstractController
         if ($pos2 === false) {
             $path = PATH_site . $path;
         }
-        if (substr($path, -1) != '/') {
-            $path .= '/';
-        }
+        // remove unnecessary slashes
+        $path = preg_replace('#/+#','/', $path);
         return $path;
     }
 
