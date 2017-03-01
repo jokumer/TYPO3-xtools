@@ -8,8 +8,9 @@
 			controller="FileDuplication"
 			action="index"
 			arguments="{selection:{storage:data.selection.storage.uid, directory:data.selection.path}}"
-			class="btn btn-sm btn-info">
-		Back to ..{data.selection.path}
+			class="btn btn-sm btn-info"
+			id="tx_xtools_btn_back_index">
+		Back to ../{data.selection.path}
 	</f:link.action>
 	<h2>
 		<f:translate key="controller.fileDuplication.action.index"/>
