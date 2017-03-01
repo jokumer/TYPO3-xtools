@@ -140,6 +140,8 @@ class FileDuplicationController extends AbstractFileController
                 }
             }
         }
+        // Assign data
+        $this->view->assign('data', $this->data);
         $this->view->assign('preferredFile', $preferredFile);
         $this->view->assign('replacedFiles', $replacedFiles);
     }
