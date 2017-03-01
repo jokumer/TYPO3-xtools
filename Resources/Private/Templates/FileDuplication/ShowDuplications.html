@@ -66,7 +66,11 @@
 					<th>Uid</th>
 					<th>Preview</th>
 					<th>Filename</th>
-					<th>Ref</th>
+					<th>
+						<span title="SELECT sr.tablename,sr.recuid,sr.field,sr.deleted,sr.ref_table,sr.ref_uid,sfr.uid, sfr.uid_local, sfr.uid_foreign, sfr.tablenames, sfr.fieldname, sfr.table_local FROM sys_refindex AS sr LEFT JOIN sys_file_reference AS sfr ON sr.tablename = 'sys_file_reference' AND sr.recuid = sfr.uid WHERE 1=1 AND sr.ref_table LIKE 'sys_file' AND sr.ref_uid IN ({f:if(condition:'{i.isLast}', then:'{file.fileFacade.uid}', else:'{file.fileFacade.uid},') -> f:for(each:'{results}', as:'file', iteration:'i')}) ORDER BY sr.ref_uid;">
+							Ref
+						</span>
+					</th>
 					<th>Meta</th>
 					<th>Date (created, modify)</th>
 					<th>Path</th>
@@ -128,7 +132,16 @@
 						</f:if>
 					</td>
 					<td>
-						{fileDuplication.references}
+						<f:if condition="{f:count(subject:'{fileDuplication.references}')}">
+							<f:then>
+								<span title="SELECT uid, uid_local, uid_foreign, tablenames, fieldname, table_local FROM sys_file_reference WHERE uid IN ({f:if(condition:'{i.isLast}', then:'{reference.uid}', else:'{reference.uid},') -> f:for(each:'{fileDuplication.references}', as:'reference', iteration:'i')})">
+									<f:count subject="{fileDuplication.references}"/>
+								</span>
+							</f:then>
+							<f:else>
+								-
+							</f:else>
+						</f:if>
 					</td>
 					<td>
 						<b>Title</b>:&nbsp;{fileDuplication.fileFacade.properties.title}<br/>

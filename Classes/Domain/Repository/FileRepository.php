@@ -118,7 +118,7 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
                         try {
                             $fileObject = $this->factory->getFileObject($row['uid']);
                             $fileDuplications[$key]['fileObject'] = $fileObject;
-                            $fileDuplications[$key]['references'] = count($this->getSysFileReferences($fileObject));
+                            $fileDuplications[$key]['references'] = $this->getSysFileReferences($fileObject);
                         } catch (ResourceDoesNotExistException $exception) {
                             // No handling, just omit the invalid reference uid
                         }
