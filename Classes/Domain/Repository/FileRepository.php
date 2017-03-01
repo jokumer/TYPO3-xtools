@@ -58,7 +58,7 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
         if ($storage instanceof ResourceStorage) {
             $addWhereArray['storage'] = 'storage = ' . $storage->getUid();
             if ($directory !== null) {
-                $addWhereArray['identifier'] = 'identifier LIKE \'\/' . $directory . '%\'';
+                $addWhereArray['identifier'] = 'identifier LIKE \'\/' . $directory . '\/%\'';
             }
             $addWhereArray['excludeProcessedFiles'] = '(identifier NOT LIKE \'%/_processed_/%\' AND pid = 0)';
             $addWhereArray['missing'] = '(missing = 0)';
@@ -94,7 +94,7 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
         if ($storage instanceof ResourceStorage) {
             $addWhereArray['storage'] = 'sf.storage = ' . $storage->getUid();
             if ($directory !== null) {
-                $addWhereArray['identifier'] = 'sf.identifier LIKE \'\/' . $directory . '%\'';
+                $addWhereArray['identifier'] = 'sf.identifier LIKE \'\/' . $directory . '\/%\'';
             }
             $addWhereArray['excludeProcessedFiles'] = '(sf.identifier NOT LIKE \'%/_processed_/%\' AND sf.pid = 0)';
             $addWhereArray['missing'] = '(sf.missing = 0)';
