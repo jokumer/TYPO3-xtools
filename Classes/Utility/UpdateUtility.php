@@ -720,16 +720,21 @@ class UpdateUtility
      *
      * @param string $source
      * @param string $target
-     * @return string
+     * @return bool $result
      * @throws \RuntimeException
      */
     public function moveFile($source, $target)
     {
-        $result = rename($source, $target);
-        if ($result === false) {
-            throw new \RuntimeException('Moving file ' . $sourcePath . ' to ' . $targetIdentifier . ' failed.', 1488329692);
+        $result = false;
+        try {
+            $result = rename($source, $target);
+        } catch (\Exception $result) {
+            if ($result === false) {
+                // @todo: handle errors, wrong charsets in file path would not work...
+                #throw new \RuntimeException('Moving file ' . $sourcePath . ' to ' . $targetIdentifier . ' failed.', 1488329692);
+            }
         }
-        return $target;
+        return $result;
     }
 
     /**

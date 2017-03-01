@@ -138,9 +138,9 @@ class FileDuplicationController extends AbstractFileController
                                     }
                                 }
                                 // Remove file from file system
-                                $target = $replacedFilesTargetPath . $fileObject->getName();
+                                $target = $replacedFilesTargetPath . $fileObject->getUid() . '__' . $fileObject->getName();
                                 $source = $this->getPathAbsolute($this->currentPathRoot . $fileObject->getIdentifier());
-                                $this->updateUtility->moveFile($source, $target);
+                                $movingResult = $this->updateUtility->moveFile($source, $target);
                                 // Set file as missing in sys_file
                                 $updateSysFileFieldsArray = ['missing' => 1];
                                 $updateSysFileResult = $this->fileRepository->updateSysFile($fileObject->getUid(), $updateSysFileFieldsArray, true);
