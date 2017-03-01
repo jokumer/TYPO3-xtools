@@ -19,6 +19,9 @@
 		<f:then>
 			<h4>Preferred file:</h4>
 			<p>
+				<fl:link.clickMenuOnIcon table="{preferredFile.combinedIdentifier}">
+					{preferredFile.uid}
+				</fl:link.clickMenuOnIcon>
 				<a href="{preferredFile.publicUrl}"
 				   target="_blank"
 				   title="{preferredFile.publicUrl}">
@@ -30,10 +33,11 @@
 								 maxHeight="64"
 								 style="max-height:64px; max-width:64px;"/>
 					</f:if>
-					{preferredFile.name} [{preferredFile.uid}]
+					{preferredFile.name}
 				</a>
 			</p>
-			<f:if condition="{replacedFiles}">
+			<f:comment>
+				<f:if condition="{replacedFiles}">
 				<f:then>
 					<h5>Replaced files:</h5>
 					<ul>
@@ -83,6 +87,7 @@
 					<h5>NO REPLACED FILES</h5>
 				</f:else>
 			</f:if>
+			</f:comment>
 		</f:then>
 		<f:else>
 			<h4>NO PREFERRED FILE</h4>
