@@ -184,6 +184,39 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
     }
 
     /**
+     * Update sys_file
+     * Including updateRefIndex
+     *
+     * @param integer $sysFileUid
+     * @param array $updateFieldsArray
+     * @param bool $updateRefIndex Default = true
+     * @return bool
+     */
+    public function updateSysFile($sysFileUid, $updateFieldsArray, $updateRefIndex = true)
+    {
+        $updateResult = false;
+        if (intval($sysFileUid) && !empty($updateFieldsArray)) {
+            $updateResult = $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+                'sys_file',
+                'uid = ' . intval($sysFileUid),
+                $updateFieldsArray
+            );
+            if ($updateResult) {
+                if ($updateRefIndex) {
+                    /** @var UpdateUtility $updateUtility */
+                    $updateUtility = GeneralUtility::makeInstance(UpdateUtility::class);
+                    $updateUtility->updateRefIndex('sys_file', intval($sysFileUid));
+                }
+            } else {
+                # failed 1
+            }
+        } else {
+            # failed 2
+        }
+        return $updateResult;
+    }
+
+    /**
      * Update sys_file_reference
      * Including updateRefIndex
      *
