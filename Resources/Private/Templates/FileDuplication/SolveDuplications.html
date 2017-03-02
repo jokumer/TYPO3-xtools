@@ -15,80 +15,158 @@
 	<h2>
 		<f:translate key="controller.fileDuplication.action.index"/>
 	</h2>
-	<h3>Solve duplications</h3>
+	<h3>Solved duplications</h3>
 	<f:if condition="{preferredFile}">
 		<f:then>
 			<h4>Preferred file:</h4>
 			<p>
-				<fl:link.clickMenuOnIcon table="{preferredFile.combinedIdentifier}">
-					{preferredFile.uid}
-				</fl:link.clickMenuOnIcon>
-				<a href="{preferredFile.publicUrl}"
-				   target="_blank"
-				   title="{preferredFile.publicUrl}">
-					<f:if condition="{preferredFile.type} == 2">
-						<f:image image="{preferredFile}"
-								 alt="{preferredFile.name}"
-								 treatIdAsReference="0"
-								 maxWidth="64"
-								 maxHeight="64"
-								 style="max-height:64px; max-width:64px;"/>
-					</f:if>
-					{preferredFile.name}
-				</a>
+				The preferred file replaced duplicated files and changed file references which belongs.
 			</p>
-			<f:comment>
-				<f:if condition="{replacedFiles}">
+			<table class="t3-table t3-datatable">
+				<theader>
+					<tr>
+						<th>Uid</th>
+						<th>Preview</th>
+						<th>Filename</th>
+						<th>Ref</th>
+						<th>Meta</th>
+						<th>Date (created, modify)</th>
+						<th>Path</th>
+					</tr>
+				</theader>
+				<tbody>
+					<tr class="odd" role="row">
+						<td>
+							<fl:link.clickMenuOnIcon table="{preferredFile.combinedIdentifier}">
+								{preferredFile.uid}
+							</fl:link.clickMenuOnIcon>
+						</td>
+						<td>
+							<f:if condition="{preferredFile.publicUrl}">
+								<f:then>
+									<a href="{preferredFile.publicUrl}"
+									   target="_blank"
+									   title="{preferredFile.publicUrl}">
+										<f:if condition="{preferredFile.type} == 2">
+											<f:image image="{preferredFile}"
+													 alt="{preferredFile.name}"
+													 treatIdAsReference="0"
+													 maxWidth="64"
+													 maxHeight="64"
+													 style="max-height:64px; max-width:64px;"/>
+										</f:if>
+									</a>
+								</f:then>
+								<f:else>
+									<span title="{preferredFile.publicUrl}">
+										NOT FOUND
+									</span>
+								</f:else>
+							</f:if>
+						</td>
+						<td>
+							<f:if condition="{preferredFile.publicUrl}">
+								<f:then>
+									<a href="{preferredFile.publicUrl}"
+									   target="_blank"
+									   title="{preferredFile.publicUrl}">
+									{preferredFile.name}
+									</a>
+								</f:then>
+								<f:else>
+									<span title="{preferredFile.publicUrl}">
+										{preferredFile.name} NOT FOUND
+									</span>
+								</f:else>
+							</f:if>
+						</td>
+						<td>
+							<f:if condition="{f:count(subject:'{preferredFile.references}')}">
+								<f:then>
+									<f:count subject="{preferredFile.references}"/>
+								</f:then>
+								<f:else>
+									<span title="unknown">?</span>
+								</f:else>
+							</f:if>
+						</td>
+						<td>
+							<b>Title</b>:&nbsp;{preferredFile.properties.title}<br/>
+							<b>Description</b>:&nbsp;{preferredFile.properties.description}<br/>
+							<b>Keywords</b>:&nbsp;{preferredFile.properties.keywords}<br/>
+							<b>Caption</b>:&nbsp;{preferredFile.properties.caption}<br/>
+						</td>
+						<td>
+							<f:format.date format="Y.m.d. H:i">
+								{preferredFile.properties.creation_date}
+							</f:format.date> <em>File</em><br/>
+							<f:format.date format="Y.m.d. H:i">
+								{preferredFile.properties.modification_date}
+							</f:format.date> <em>File</em><br/>
+							<f:format.date format="Y.m.d. H:i">
+								{preferredFile.properties.crdate}
+							</f:format.date> <em>DB</em><br/>
+							<f:format.date format="Y.m.d. H:i">
+								{preferredFile.properties.tstamp}
+							</f:format.date> <em>DB</em><br/>
+						</td>
+						<td>
+							<f:if condition="{preferredFile.publicUrl}">
+								<f:then>
+									{preferredFile.publicUrl}
+								</f:then>
+								<f:else>
+									NOT FOUND
+								</f:else>
+							</f:if>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<f:if condition="{replacedFiles}">
 				<f:then>
-					<h5>Replaced files:</h5>
-					<ul>
-						<f:for each="{replacedFiles}" as="replacedFile">
-							<li>
-								<a href="{replacedFile.fileObject.publicUrl}"
-								   target="_blank"
-								   title="{replacedFile.fileObject.publicUrl}">
-									<f:if condition="{replacedFile.fileObject.type} == 2">
-										<f:image image="{replacedFile.fileObject}"
-												 alt="{replacedFile.fileObject.name}"
-												 treatIdAsReference="0"
-												 maxWidth="64"
-												 maxHeight="64"
-												 style="max-height:64px; max-width:64px;"/>
-									</f:if>
-									{replacedFile.fileObject.name} [{replacedFile.fileObject.uid}]
-								</a>
-								<f:if condition="{replacedFile.sysFileReferences}">
-									<f:then>
-										<h6>File references</h6>
-										<ul>
-											<f:for each="{replacedFile.sysFileReferences}" as="sysFileReference">
-												<li>
-													updated ...
-													<ul>
-														<li>{sysFileReference.uid}</li>
-														<li>{sysFileReference.pid}</li>
-														<li>{sysFileReference.uid_local}</li>
-														<li>{sysFileReference.uid_foreign}</li>
-														<li>{sysFileReference.tablenames}</li>
-														<li>{sysFileReference.fieldname}</li>
-													</ul>
-												</li>
-											</f:for>
-										</ul>
-									</f:then>
-									<f:else>
-										<h6>NO FILE REFERENCES</h6>
-									</f:else>
-								</f:if>
-							</li>
-						</f:for>
-					</ul>
+					<h4>Replaced files:</h4>
+					<p>
+						Files has been moved to {replacedFilesTargetPath}, where a log file belongs.
+					</p>
+					<table class="t3-table t3-datatable">
+						<theader>
+							<tr>
+								<th>Uid</th>
+								<th>File</th>
+								<th>References</th>
+							</tr>
+						</theader>
+						<tbody>
+							<f:for each="{replacedFiles}" as="replacedFile" key="uid" iteration="i">
+								<tr class="{f:if(condition: i.isEven, then: 'even', else: 'odd')}" role="row">
+									<td>
+										{uid}
+									</td>
+									<td>
+										{replacedFile.identifier}
+									</td>
+									<td>
+										<f:if condition="{replacedFile.sysFileReferences}">
+											<f:then>
+												<f:for each="{replacedFile.sysFileReferences}" as="reference" key="referenceUid" iteration="iteration">
+													{f:if(condition:'{iteration.isLast}', then:'{referenceUid}', else:'{referenceUid},')}
+												</f:for>
+											</f:then>
+											<f:else>
+												
+											</f:else>
+										</f:if>
+									</td>
+								</tr>
+							</f:for>
+						</tbody>
+					</table>
 				</f:then>
 				<f:else>
-					<h5>NO REPLACED FILES</h5>
+					<h4>NO REPLACED FILES</h4>
 				</f:else>
 			</f:if>
-			</f:comment>
 		</f:then>
 		<f:else>
 			<h4>NO PREFERRED FILE</h4>

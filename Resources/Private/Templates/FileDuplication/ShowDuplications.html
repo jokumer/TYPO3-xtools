@@ -84,11 +84,11 @@
 				</tr>
 			</theader>
 			<tbody>
-			<f:for each="{results}" as="fileDuplication" iteration="iterator">
-				<tr class="{f:if(condition: iterator.isEven, then: 'even', else: 'odd')}"
+			<f:for each="{results}" as="fileDuplication" iteration="i">
+				<tr class="{f:if(condition: i.isEven, then: 'even', else: 'odd')}"
 					role="row">
 					<td>
-						<f:if condition="{iterator.isFirst}">
+						<f:if condition="{i.isFirst}">
 							<f:then>
 								<f:if condition="{fileDuplication.fileFacade.publicUrl}">
 									<f:form.radio id="preferred-file-selection-{fileDuplication.fileFacade.uid}"
@@ -152,7 +152,7 @@
 					<td>
 						<f:if condition="{f:count(subject:'{fileDuplication.references}')}">
 							<f:then>
-								<span title="SELECT uid, uid_local, uid_foreign, tablenames, fieldname, table_local FROM sys_file_reference WHERE uid IN ({f:if(condition:'{i.isLast}', then:'{reference.uid}', else:'{reference.uid},') -> f:for(each:'{fileDuplication.references}', as:'reference', iteration:'i')})">
+								<span title="SELECT uid, uid_local, uid_foreign, tablenames, fieldname, table_local FROM sys_file_reference WHERE uid IN ({f:if(condition:'{iteration.isLast}', then:'{reference.uid}', else:'{reference.uid},') -> f:for(each:'{fileDuplication.references}', as:'reference', iteration:'iteration')})">
 									<f:count subject="{fileDuplication.references}"/>
 								</span>
 							</f:then>

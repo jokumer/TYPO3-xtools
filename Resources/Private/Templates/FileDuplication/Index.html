@@ -97,8 +97,8 @@
 			</tr>
 		</theader>
 		<tbody>
-		<f:for each="{results}" as="filesDuplication" iteration="iterator">
-			<tr class="{f:if(condition: iterator.isEven, then: 'even', else: 'odd')}"
+		<f:for each="{results}" as="filesDuplication" iteration="i">
+			<tr class="{f:if(condition: i.isEven, then: 'even', else: 'odd')}"
 				role="row">
 				<td>
 					<f:link.action action="showDuplications"
