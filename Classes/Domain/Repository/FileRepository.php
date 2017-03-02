@@ -197,6 +197,7 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
     {
         $updateResult = false;
         if (intval($sysFileUid) && !empty($updateFieldsArray)) {
+            $updateFieldsArray['tstamp'] = $GLOBALS['EXEC_TIME'];
             $updateResult = $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
                 'sys_file',
                 'uid = ' . intval($sysFileUid),
@@ -230,6 +231,7 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
     {
         $updateResult = false;
         if (intval($sysFileReferenceUid) && !empty($updateFieldsArray)) {
+            $updateFieldsArray['tstamp'] = $GLOBALS['EXEC_TIME'];
             $updateResult = $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
                 'sys_file_reference',
                 'uid = ' . intval($sysFileReferenceUid),
