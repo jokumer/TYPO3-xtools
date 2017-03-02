@@ -144,28 +144,19 @@ class FileDuplicationController extends AbstractFileController
                                 $updateSysFileResult = $this->fileRepository->updateSysFile($fileObject->getUid(), $updateSysFileFieldsArray, true);
                             }
                         }
-                        // Log textfile (long)
-                        $logMessageArray = [
-                            'currentPathRoot' => $this->currentPathRoot,
-                            'preferredFileUid' => $preferredFileUid,
-                            'replacedFiles' => serialize($replacedFiles),
-                            'replacedFilesTargetPath' => $replacedFilesTargetPath,
-                            'replacedFileReferences' => [],
-                            'storage' => $this->storage,
-                        ];
-                        $logFile = $replacedFilesTargetPath . '_' . __FUNCTION__ . '.log';
-                        $fh = fopen($logFile, 'w');
-                        fwrite($fh, serialize($logMessageArray));
-                        fclose($fh);
-                        // Log system (short)
-                        $this->updateUtility->logMessage(
-                            serialize([
+                        // Log
+                        $this->log(
+                            [
                                 'controller' => __CLASS__,
                                 'action' => __FUNCTION__,
-                                'storageUid' => $this->storage->getUid(),
                                 'currentPathRoot' => $this->currentPathRoot,
                                 'preferredFileUid' => $preferredFileUid,
-                            ])
+                                'replacedFiles' => serialize($replacedFiles),
+                                'replacedFilesTargetPath' => $replacedFilesTargetPath,
+                                'replacedFileReferences' => [],
+                                'storage' => $this->storage,
+                            ],
+                            $replacedFilesTargetPath . '_' . __FUNCTION__ . '.log'
                         );
                     }
                 }
@@ -178,5 +169,39 @@ class FileDuplicationController extends AbstractFileController
         $this->view->assign('replacedFileReferences', $replacedFileReferences);
         $this->view->assign('executionTime', $executionTime);
         $this->view->assign('replacedFilesTargetPath', $replacedFilesTargetPath);
+    }
+
+    /**
+     * Log
+     * Write long log file into given directory
+     * Write short log into db table sys_log
+     * 
+     * @param array $logMessageArray
+     * @param string $logFile
+     * @param bool $logSys default:true
+     * @return void
+     */
+    private function log(array $logMessageArray, $logFile = '', $logSys = true)
+    {
+        if (!empty($logMessageArray)) {
+            // Log file (long)
+            if ($logFile) {
+                $fh = fopen($logFile, 'w');
+                fwrite($fh, serialize($logMessageArray));
+                fclose($fh);
+            }
+            // Log system (short)
+            if ($logSys) {
+                $this->updateUtility->logMessage(
+                    serialize([
+                        'controller' => $logMessageArray['controller'],
+                        'action' => $logMessageArray['action'],
+                        'storageUid' => $logMessageArray['storage']->getUid(),
+                        'currentPathRoot' => $logMessageArray['currentPathRoot'],
+                        'preferredFileUid' => $logMessageArray['preferredFileUid']
+                    ])
+                );
+            }
+        }
     }
 }
