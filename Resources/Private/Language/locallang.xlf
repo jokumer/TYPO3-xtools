@@ -6,11 +6,20 @@
 			<trans-unit id="controller.toolbox.action.index" xml:space="preserve">
 				<source>Index</source>
 			</trans-unit>
+			<trans-unit id="controller.toolbox.action.backup" xml:space="preserve">
+				<source>Backup</source>
+			</trans-unit>
 			<trans-unit id="controller.fileAndFolderPermission.action.index" xml:space="preserve">
 				<source>File and folder permission</source>
 			</trans-unit>
 			<trans-unit id="controller.fileDuplication.action.index" xml:space="preserve">
 				<source>File duplication</source>
+			</trans-unit>
+			<trans-unit id="controller.fileDuplication.action.showDuplications" xml:space="preserve">
+				<source>Show duplications</source>
+			</trans-unit>
+			<trans-unit id="controller.fileDuplication.action.solveDuplications" xml:space="preserve">
+				<source>Solve duplications</source>
 			</trans-unit>
 		</body>
 	</file>

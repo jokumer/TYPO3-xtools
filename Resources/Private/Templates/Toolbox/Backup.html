@@ -1,0 +1,41 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+	xmlns:fl="http://typo3.org/ns/TYPO3/CMS/Filelist/ViewHelpers">
+<f:layout name="Default"/>
+
+<f:section name="content">
+	<f:flashMessages/>
+	<h2>
+		<f:translate key="controller.toolbox.action.backup"/>
+	</h2>
+	<f:if condition="{data.executed}">
+		<f:then>
+			<f:if condition="{data.selection.tables}">
+				<p>Tables has been copied as backup append with _[timestamp]. Ensure you cleanup after you.</p>
+			</f:if>
+		</f:then>
+		<f:else>
+			<f:if condition="{data.selection.tables}">
+				<p>Tables will be copied as backup append with _[timestamp].</p>
+			</f:if>
+			<f:form action="backup" controller="Toolbox">
+				<f:if condition="{data.selection.initiator}">
+					<f:form.hidden name="selection[initiator][action]" value="{data.selection.initiator.action}"/>
+					<f:form.hidden name="selection[initiator][controller]" value="{data.selection.initiator.controller}"/>
+				</f:if>
+				<f:if condition="{data.selection.tables}">
+					<f:for each="{data.selection.tables}" as="table">
+						<f:form.hidden name="selection[tables][]" value="{table}"/>
+					</f:for>
+				</f:if>
+				<f:form.hidden name="execute" value="1"/>
+				<f:form.submit value="Backup" class="btn btn-danger"/>
+			</f:form>
+		</f:else>
+	</f:if>
+	<f:link.action
+			action="{data.selection.initiator.action}"
+			controller="{data.selection.initiator.controller}"
+			class="btn btn-info">
+		Back to last action
+	</f:link.action>
+</f:section>

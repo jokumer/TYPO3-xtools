@@ -70,7 +70,7 @@ class AbstractController extends ActionController
     protected function initializeView(ViewInterface $view)
     {
         parent::initializeView($view);
-        // Assign controller/action name for layout
+        // Assign controller/action name
         $view->assign('controllerName', $this->request->getControllerName());
         $view->assign('actionName', $this->request->getControllerActionName());
         // Assign extension configuration

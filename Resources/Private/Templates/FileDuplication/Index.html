@@ -5,6 +5,14 @@
 	<h2>
 		<f:translate key="controller.fileDuplication.action.index"/>
 	</h2>
+	<f:if condition="{data.selection.storage}">
+		<f:link.action controller="Toolbox"
+					   action="backup"
+					   arguments="{selection:{initiator:{action:'{actionName}', controller:'{controllerName}'},tables:{0:'sys_file', 1:'sys_file_reference'}},execute:0}"
+					   class="btn btn-info">
+			Want to backup of tables?
+		</f:link.action>
+	</f:if>
 	<h3>Storages</h3>
 	<f:if condition="{data.list.storages}">
 		<f:then>
@@ -43,17 +51,18 @@
 	<f:if condition="{filesDuplications}">
 		<f:then>
 			<p>
-				Files count: <f:count subject="{filesDuplications}"/>
+				Files count:
+				<f:count subject="{filesDuplications}"/>
 			</p>
 			<f:if condition="{f:count(subject:'{filesDuplications}')} > {extensionConfiguration.pagination_itemsPerPage}">
 				<f:then>
 					<f:widget.paginate objects="{filesDuplications}"
 									   as="results"
 									   configuration="{
-									     maximumNumberOfLinks: 20,
-									     itemsPerPage: '{extensionConfiguration.pagination_itemsPerPage}',
-									     insertAbove: 1,
-									     insertBelow: 1
+									       maximumNumberOfLinks: 20,
+									       itemsPerPage: '{extensionConfiguration.pagination_itemsPerPage}',
+									       insertAbove: 1,
+									       insertBelow: 1
 									   }">
 						<f:render section="list_filesDuplication" arguments="{results:results, data:data}"/>
 					</f:widget.paginate>
@@ -95,11 +104,12 @@
 					<f:link.action action="showDuplications"
 								   controller="FileDuplication"
 								   arguments="{
-								     selection:{storage:data.selection.storage.uid, directory:data.selection.path},
-								     sha1:filesDuplication.sha1
+								       selection:{storage:data.selection.storage.uid, directory:data.selection.path},
+								       sha1:filesDuplication.sha1
 								   }"
 								   id="tx_xtools_ahref_first_duplication">
-						<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-open.svg" width="16" height="16">
+						<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-open.svg" width="16"
+							 height="16">
 						<strong>{filesDuplication.totalCount}</strong>
 					</f:link.action>
 				</td>
@@ -147,7 +157,8 @@
 				</td>
 				<td>
 					File size: {filesDuplication.size -> f:format.bytes()} <br/>
-					Reduction: {f:cObject(typoscriptObjectPath:'lib.tx_xtools.math', data:'({filesDuplication.totalCount}-1)*{filesDuplication.size}') -> f:format.bytes()}
+					Reduction: {f:cObject(typoscriptObjectPath:'lib.tx_xtools.math',
+					data:'({filesDuplication.totalCount}-1)*{filesDuplication.size}') -> f:format.bytes()}
 				</td>
 			</tr>
 		</f:for>

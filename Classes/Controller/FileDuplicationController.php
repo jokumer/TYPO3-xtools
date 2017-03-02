@@ -107,9 +107,7 @@ class FileDuplicationController extends AbstractFileController
                 unset($fileDuplications[$preferredFileUid]);
                 // Replace each duplicated file with preferred file in sys_file_reference
                 if (!empty($fileDuplications)) {
-                    // @todo: Backup sys_file and sys_file_reference
-                    #$tableNameSuffix = '_bakfileduplicationsolves_' . $GLOBALS['EXEC_TIME'];
-                    #$this->updateUtility->backupDBTables(['sys_file', 'sys_file_reference'], $tableNameSuffix);
+                    // @todo: make backup path configurable
                     $replacedFilesTargetPath = PATH_site . 'typo3temp/tx_xtools/' . $executionTime . '/';
                     $mkdir = GeneralUtility::mkdir_deep($replacedFilesTargetPath);
                     if ($mkdir !== false) {

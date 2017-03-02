@@ -9,7 +9,7 @@ if (TYPO3_MODE === 'BE') {
         'Toolbox',
         '',
         array(
-            'Toolbox' => 'index',
+            'Toolbox' => 'index,backup',
             'FileAndFolderPermission' => 'index',
             'FileDuplication' => 'index,showDuplications,solveDuplications',
         ),

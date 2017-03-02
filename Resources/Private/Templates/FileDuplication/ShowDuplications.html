@@ -8,7 +8,7 @@
 			controller="FileDuplication"
 			action="index"
 			arguments="{selection:{storage:data.selection.storage.uid, directory:data.selection.path}}"
-			class="btn btn-sm btn-info">
+			class="btn btn-info">
 		Back to ..{data.selection.path}
 	</f:link.action>
 	<h2>
@@ -35,10 +35,10 @@
 					<f:widget.paginate objects="{fileDuplications}"
 									   as="results"
 									   configuration="{
-									     maximumNumberOfLinks: 20,
-									     itemsPerPage: '{extensionConfiguration.pagination_itemsPerPage}',
-									     insertAbove: 1,
-									     insertBelow: 1
+									       maximumNumberOfLinks: 20,
+									       itemsPerPage: '{extensionConfiguration.pagination_itemsPerPage}',
+									       insertAbove: 1,
+									       insertBelow: 1
 									   }">
 						<f:render section="list" arguments="{results:results, data:data}"/>
 					</f:widget.paginate>
@@ -47,6 +47,12 @@
 					<f:render section="list" arguments="{results:fileDuplications, data:data}"/>
 				</f:else>
 			</f:if>
+			<f:link.action controller="Toolbox"
+						   action="backup"
+						   arguments="{selection:{initiator:{action:'{actionName}', controller:'{controllerName}'}, tables:{0:'sys_file', 1:'sys_file_reference'}, storage:data.selection.storage.uid, directory:data.selection.path}, execute:0}"
+						   class="btn btn-info">
+				Want to backup of tables before any changes?
+			</f:link.action>
 		</f:then>
 		<f:else>
 			No files found!
