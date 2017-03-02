@@ -742,11 +742,18 @@ class UpdateUtility
      * Write sys_log using \TYPO3\CMS\Core\Utility\GeneralUtility::sysLog
      *
      * @param string $message
+     * @param integer $type Denotes which module that has submitted the entry. See "TYPO3 Core API". Use "4" for extensions.
+     * @param integer $action Denotes which specific operation that wrote the entry. Use "0" when no sub-categorizing applies
+     * @param integer $error Flag. 0 = message, 1 = error (user problem), 2 = System Error (which should not happen), 3 = security notice (admin)
+     * @param integer $details_nr The message number. Specific for each $type and $action. This will make it possible to translate errormessages to other languages
+     * @param string $details Default text that follows the message (in english!). Possibly translated by identification through type/action/details_nr
+     * @param array $data Data that follows the log. Might be used to carry special information. If an array the first 5 entries (0-4) will be sprintf'ed with the details-text
      * @return void
      */
-    public function logMessage($message = null) {
+    public function logMessage($message = null, $type = 4, $action = 0, $error = 0, $details_nr = 0, array $data = null) {
         if ($message !== null) {
-            $GLOBALS['BE_USER']->simplelog($message, 'tx_xtools', 0);
+            // $GLOBALS['BE_USER']->simplelog($message, 'tx_xtools', $type);
+            $GLOBALS['BE_USER']->writelog($type, $action, $error, $details_nr, 'tx_xtools' . $message, $data);
         }
     }
 }

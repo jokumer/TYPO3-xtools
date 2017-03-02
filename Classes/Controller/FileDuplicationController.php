@@ -192,6 +192,7 @@ class FileDuplicationController extends AbstractFileController
             }
             // Log system (short)
             if ($logSys) {
+                $type = 2; // sys_log type 2:File
                 $this->updateUtility->logMessage(
                     serialize([
                         'controller' => $logMessageArray['controller'],
@@ -199,7 +200,8 @@ class FileDuplicationController extends AbstractFileController
                         'storageUid' => $logMessageArray['storage']->getUid(),
                         'currentPathRoot' => $logMessageArray['currentPathRoot'],
                         'preferredFileUid' => $logMessageArray['preferredFileUid']
-                    ])
+                    ]),
+                    $type
                 );
             }
         }
