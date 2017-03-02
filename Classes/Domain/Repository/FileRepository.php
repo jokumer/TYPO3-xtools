@@ -137,7 +137,6 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
      *
      * @param integer $limit
      * @return QueryResultInterface
-     * @todo: search inside file-storage/folder only
      */
     public function getFileStorages($limit = 1000) {
         $fileStorages = null;
