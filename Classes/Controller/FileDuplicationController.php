@@ -146,20 +146,33 @@ class FileDuplicationController extends AbstractFileController
                                 $updateSysFileResult = $this->fileRepository->updateSysFile($fileObject->getUid(), $updateSysFileFieldsArray, true);
                             }
                         }
+                        // Log textfile (long)
+                        $logMessageArray = [
+                            'currentPathRoot' => $this->currentPathRoot,
+                            'preferredFileUid' => $preferredFileUid,
+                            'replacedFiles' => serialize($replacedFiles),
+                            'replacedFilesTargetPath' => $replacedFilesTargetPath,
+                            'replacedFileReferences' => [],
+                            'storage' => $this->storage,
+                        ];
+                        $logFile = $replacedFilesTargetPath . '_' . __FUNCTION__ . '.log';
+                        $fh = fopen($logFile, 'w');
+                        fwrite($fh, serialize($logMessageArray));
+                        fclose($fh);
+                        // Log system (short)
+                        $this->updateUtility->logMessage(
+                            serialize([
+                                'controller' => __CLASS__,
+                                'action' => __FUNCTION__,
+                                'storageUid' => $this->storage->getUid(),
+                                'currentPathRoot' => $this->currentPathRoot,
+                                'preferredFileUid' => $preferredFileUid,
+                            ])
+                        );
                     }
                 }
             }
         }
-        // Log
-        $logMessageArray = [
-            'storage' => $this->storage,
-            'currentPathRoot' => $this->currentPathRoot,
-            'preferredFileUid' => $preferredFileUid,
-            'replacedFiles' => serialize($replacedFiles),
-            'replacedFilesTargetPath' => $replacedFilesTargetPath,
-            'replacedFileReferences' => []
-        ];
-        $this->updateUtility->logMessage(serialize($logMessageArray));
         // Assign data
         $this->view->assign('data', $this->data);
         $this->view->assign('preferredFile', $preferredFile);
