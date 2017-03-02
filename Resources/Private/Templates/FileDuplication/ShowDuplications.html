@@ -90,15 +90,19 @@
 					<td>
 						<f:if condition="{iterator.isFirst}">
 							<f:then>
-								<f:form.radio id="preferred-file-selection-{fileDuplication.fileFacade.uid}"
-									  name="preferredFileUid"
-									  value="{fileDuplication.fileFacade.uid}"
-									  additionalAttributes="{checked:'checked'}"/>
+								<f:if condition="{fileDuplication.fileFacade.publicUrl}">
+									<f:form.radio id="preferred-file-selection-{fileDuplication.fileFacade.uid}"
+										  name="preferredFileUid"
+										  value="{fileDuplication.fileFacade.uid}"
+										  additionalAttributes="{checked:'checked'}"/>
+								</f:if>
 							</f:then>
 							<f:else>
-								<f:form.radio id="preferred-file-selection-{fileDuplication.fileFacade.uid}"
-									  name="preferredFileUid"
-									  value="{fileDuplication.fileFacade.uid}"/>
+								<f:if condition="{fileDuplication.fileFacade.publicUrl}">
+									<f:form.radio id="preferred-file-selection-{fileDuplication.fileFacade.uid}"
+										  name="preferredFileUid"
+										  value="{fileDuplication.fileFacade.uid}"/>
+								</f:if>
 							</f:else>
 						</f:if>
 					</td>
