@@ -95,7 +95,6 @@ class FileDuplicationController extends AbstractFileController
             $sha1 = $this->request->getArgument('sha1');
         }
         if ($this->request->hasArgument('preferredFileUid')) {
-            // @todo: !!!!!!!!!!! if uid then always use from fileObject instead this one
             if (intval($this->request->getArgument('preferredFileUid'))) {
                 $preferredFileObject = $this->fileRepository->getFileObject(intval($this->request->getArgument('preferredFileUid')));
                 if ($preferredFileObject instanceof File) {

@@ -110,7 +110,7 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
                     . ' LEFT JOIN sys_file_metadata AS sfm ON sf.uid = sfm.file',
                     'sf.sha1 = ' . $this->getDatabaseConnection()->fullQuoteStr($sha1, 'sys_file') . $addWhere,
                     'sf.uid',
-                    // @todo: group order by meta (title, description, caption, keyword..)
+                    // @todo: Advanced order by meta (title, description, caption, keyword..) using case if then ...
                     'sfrCount DESC, sf.name ASC, sfm.title DESC, sfm.description DESC, sfm.caption DESC, sfm.keywords DESC',
                     $limit,
                     'uid'
@@ -243,8 +243,6 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
                 if ($updateRefIndex) {
                     /** @var UpdateUtility $updateUtility */
                     $updateUtility = GeneralUtility::makeInstance(UpdateUtility::class);
-                    // @todo: ensure refIndex for sys_file_reference has been updated.
-                    // SELECT * FROM `sys_refindex` WHERE `tablename` LIKE 'sys_file_reference' AND recuid = $sysFileReferenceUid;
                     $updateUtility->updateRefIndex('sys_file_reference', intval($sysFileReferenceUid));
                 }
             } else {
