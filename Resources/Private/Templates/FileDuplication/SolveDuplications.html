@@ -36,9 +36,9 @@
 				</thead>
 				<tbody>
 					<tr class="odd" role="row">
-						<td>
+						<td style="white-space: nowrap">
 							<fl:link.clickMenuOnIcon table="{preferredFile.combinedIdentifier}">
-								{preferredFile.uid}
+								{preferredFile.icon->f:format.raw()} {preferredFile.uid}
 							</fl:link.clickMenuOnIcon>
 						</td>
 						<td>
@@ -48,7 +48,7 @@
 									   target="_blank"
 									   title="{preferredFile.publicUrl}">
 										<f:if condition="{preferredFile.type} == 2">
-											<f:image image="{preferredFile}"
+											<f:image image="{preferredFile.resource}"
 													 alt="{preferredFile.name}"
 													 treatIdAsReference="0"
 													 maxWidth="64"
@@ -141,7 +141,7 @@
 							<f:for each="{replacedFiles}" as="replacedFile" key="uid" iteration="i">
 								<tr class="{f:if(condition: i.isEven, then: 'even', else: 'odd')}" role="row">
 									<td>
-										{replacedFile.fileObject.uid}
+										{replacedFile.fileFacade.icon->f:format.raw()} {replacedFile.fileFacade.uid}
 									</td>
 									<td>
 										<b>From</b>: {replacedFile.sourcePath}<br/>

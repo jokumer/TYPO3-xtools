@@ -92,15 +92,15 @@ class FileDuplicationController extends AbstractFileController
         $replacedFileReferences = null;
         // Get request
         if ($this->request->hasArgument('preferredFileUid')) {
-            $preferredFileUid = $this->request->getArgument('preferredFileUid');
-            $preferredFile = $this->fileRepository->getFileObject($preferredFileUid);
+            $preferredFileUid = intval($this->request->getArgument('preferredFileUid'));
+            $preferredFile = new FileFacade($this->fileRepository->getFileObject($preferredFileUid));
         }
         $sha1 = null;
         if ($this->request->hasArgument('sha1')) {
             $sha1 = $this->request->getArgument('sha1');
         }
         // Get concerning file duplications
-        if (intval($preferredFileUid) && $sha1 && $this->storage) {
+        if ($preferredFileUid && $sha1 && $this->storage) {
             $fileDuplications = $this->fileRepository->getFileDuplications($this->storage, $this->currentPathSelected, $sha1);
             // Remove preferred file from stack
             if (!empty($fileDuplications)) {
@@ -115,7 +115,7 @@ class FileDuplicationController extends AbstractFileController
                             if ($duplicat['fileObject'] instanceof File) {
                                 /** @var File $fileObject */
                                 $fileObject = $duplicat['fileObject'];
-                                $replacedFiles[$fileObject->getUid()]['fileObject'] = $fileObject;
+                                $replacedFiles[$fileObject->getUid()]['fileFacade'] = new FileFacade($fileObject);
                                 $replacedFiles[$fileObject->getUid()]['sourcePath'] = $this->getPathRelative($this->currentPathRoot . $fileObject->getIdentifier());
                                 $replacedFiles[$fileObject->getUid()]['targetPath'] = $this->getPathRelative($replacedFilesTargetPath . $fileObject->getUid() . '__' . $fileObject->getName());
                                 if (intval($duplicat['references']) > 0) {
@@ -127,7 +127,7 @@ class FileDuplicationController extends AbstractFileController
                                         $replacedFileReferences = [];
                                         foreach ($sysFileReferences as $key => $sysFileReference) {
                                             // Replace uid_local with uid of preferred file uid
-                                            $updateSysFileReferenceFieldsArray = ['uid_local' => intval($preferredFileUid)];
+                                            $updateSysFileReferenceFieldsArray = ['uid_local' => $preferredFileUid];
                                             $updateSysFileReferenceResult = $this->fileRepository->updateSysFileReference(intval($sysFileReference['uid']), $updateSysFileReferenceFieldsArray, true);
                                             if ($updateSysFileReferenceResult) {
                                                 $replacedFileReferences[$sysFileReference['uid']] = $sysFileReference;
