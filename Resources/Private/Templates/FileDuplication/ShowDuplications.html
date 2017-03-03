@@ -63,7 +63,7 @@
 <f:section name="list">
 	<p>Select preferred file and submit below, to replace file duplications and adapt their references. Ensure duplicated files are not used in any links!</p>
 	<f:form action="solveDuplications" controller="FileDuplication">
-		<f:form.hidden name="sha1" value="{results.0.fileFacade.sha1}"/>
+		<f:form.hidden name="selection[sha1]" value="{data.selection.sha1}"/>
 		<f:form.hidden name="selection[storage]" value="{data.selection.storage.uid}"/>
 		<f:form.hidden name="selection[path]" value="{data.selection.path}"/>
 		<table class="t3-table t3-datatable">
@@ -87,31 +87,25 @@
 			<f:for each="{results}" as="fileDuplication" iteration="i">
 				<tr class="{f:if(condition: i.isEven, then: 'even', else: 'odd')}"
 					role="row">
-					<td>
-						<f:if condition="{i.isFirst}">
+					<td class="{f:if(condition: fileDuplication.exists, then: '', else: 'alert-warning')}">
+						<f:if condition="{fileDuplication.exists}">
 							<f:then>
-								<f:if condition="{fileDuplication.fileFacade.publicUrl}">
-									<f:form.radio id="preferred-file-selection-{fileDuplication.fileFacade.uid}"
-										  name="preferredFileUid"
-										  value="{fileDuplication.fileFacade.uid}"
-										  additionalAttributes="{checked:'checked'}"/>
-								</f:if>
+								<f:form.radio id="preferred-file-selection-{fileDuplication.fileFacade.uid}"
+									  name="preferredFileUid"
+									  value="{fileDuplication.fileFacade.uid}"
+									  checked="{fileDuplication.isFirstFile}"/>
 							</f:then>
 							<f:else>
-								<f:if condition="{fileDuplication.fileFacade.publicUrl}">
-									<f:form.radio id="preferred-file-selection-{fileDuplication.fileFacade.uid}"
-										  name="preferredFileUid"
-										  value="{fileDuplication.fileFacade.uid}"/>
-								</f:if>
+								-
 							</f:else>
 						</f:if>
 					</td>
-					<td style="white-space: nowrap">
+					<td style="white-space: nowrap" class="{f:if(condition: fileDuplication.exists, then: '', else: 'alert-warning')}">
 						<fl:link.clickMenuOnIcon table="{fileDuplication.fileFacade.combinedIdentifier}">
 							{fileDuplication.fileFacade.icon->f:format.raw()} {fileDuplication.fileFacade.uid}
 						</fl:link.clickMenuOnIcon>
 					</td>
-					<td>
+					<td class="{f:if(condition: fileDuplication.exists, then: '', else: 'alert-warning')}">
 						<f:if condition="{fileDuplication.fileFacade.publicUrl}">
 							<f:then>
 								<a href="{fileDuplication.fileFacade.publicUrl}"
@@ -135,7 +129,10 @@
 							</f:else>
 						</f:if>
 					</td>
-					<td>
+					<td class="{f:if(condition: fileDuplication.exists, then: '', else: 'alert-warning')}">
+						<f:if condition="replacedFile.fileNotFound">
+							<b>File not found</b>
+						</f:if>
 						<f:if condition="{fileDuplication.fileFacade.publicUrl}">
 							<f:then>
 								<a href="{fileDuplication.fileFacade.publicUrl}"
@@ -149,7 +146,7 @@
 							</f:else>
 						</f:if>
 					</td>
-					<td>
+					<td class="{f:if(condition: fileDuplication.exists, then: '', else: 'alert-warning')}">
 						<f:if condition="{f:count(subject:'{fileDuplication.fileReferences}')}">
 							<f:then>
 								<span title="SELECT uid, uid_local, uid_foreign, tablenames, fieldname, table_local FROM sys_file_reference WHERE uid IN ({f:if(condition:'{iteration.isLast}', then:'{fileReference.uid}', else:'{fileReference.uid},') -> f:for(each:'{fileDuplication.fileReferences}', as:'fileReference', iteration:'iteration')})">
@@ -161,13 +158,13 @@
 							</f:else>
 						</f:if>
 					</td>
-					<td>
+					<td class="{f:if(condition: fileDuplication.exists, then: '', else: 'alert-warning')}">
 						<b>Title</b>:&nbsp;{fileDuplication.fileFacade.properties.title}<br/>
 						<b>Description</b>:&nbsp;{fileDuplication.fileFacade.properties.description}<br/>
 						<b>Keywords</b>:&nbsp;{fileDuplication.fileFacade.properties.keywords}<br/>
 						<b>Caption</b>:&nbsp;{fileDuplication.fileFacade.properties.caption}<br/>
 					</td>
-					<td>
+					<td class="{f:if(condition: fileDuplication.exists, then: '', else: 'alert-warning')}">
 						<f:format.date format="Y.m.d. H:i">
 							{fileDuplication.fileFacade.properties.creation_date}
 						</f:format.date> <em>File</em><br/>
@@ -181,7 +178,10 @@
 							{fileDuplication.fileFacade.properties.tstamp}
 						</f:format.date> <em>DB</em><br/>
 					</td>
-					<td>
+					<td class="{f:if(condition: fileDuplication.exists, then: '', else: 'alert-warning')}">
+						<f:if condition="replacedFile.fileNotFound">
+							<b>File not found</b>
+						</f:if>
 						<f:if condition="{fileDuplication.fileFacade.publicUrl}">
 							<f:then>
 								{fileDuplication.fileFacade.publicUrl}

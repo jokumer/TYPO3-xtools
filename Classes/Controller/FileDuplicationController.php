@@ -32,6 +32,7 @@ class FileDuplicationController extends AbstractFileController
         $this->data['selection']['directory'] = ($this->storage) ? $this->getDirectoryListData($this->currentPathRoot) : null;
         $this->data['selection']['storage'] = $this->storage;
         $this->data['selection']['path'] = $this->currentPathSelected;
+        $this->data['selection']['sha1'] = '';
         $this->data['icons']['apps-filetree-folder-default'] = $this->iconFactory->getIcon('apps-filetree-folder-default', Icon::SIZE_SMALL);
         $this->data['icons']['apps-filetree-folder-opened'] = $this->iconFactory->getIcon('apps-filetree-folder-opened', Icon::SIZE_SMALL);
         $this->data['icons']['apps-filetree-folder-locked'] = $this->iconFactory->getIcon('apps-filetree-folder-locked', Icon::SIZE_SMALL);
@@ -58,24 +59,36 @@ class FileDuplicationController extends AbstractFileController
      */
     public function showDuplicationsAction()
     {
-        // Assign data
-        $this->view->assign('data', $this->data);
         // Assign file duplications
         if ($this->request->hasArgument('sha1')) {
             $sha1 = $this->request->getArgument('sha1');
             $fileDuplications = $this->fileRepository->getFileDuplications($this->storage, $this->currentPathSelected, $sha1);
             if (!empty($fileDuplications)) {
                 // Assign fileDuplicationsArray use FileFacade, add references count
-                $count = 0;
                 $fileDuplicationsArray = [];
+                $firstFileExists = false;
                 foreach ($fileDuplications as $key => $fileDuplication) {
-                    $fileDuplicationsArray[$count]['fileFacade'] = new FileFacade($fileDuplication['fileObject']);
-                    $fileDuplicationsArray[$count]['fileReferences'] = $fileDuplication['fileReferences'];
-                    $count++;
+                    $fileObject = $fileDuplication['fileObject'];
+                    if ($fileObject instanceof File) {
+                        $pathAbsolute = $this->getPathAbsolute($this->currentPathRoot . $fileObject->getIdentifier());
+                        if (file_exists($pathAbsolute)) {
+                            $fileDuplicationsArray[$key]['exists'] = true;
+                            $fileDuplicationsArray[$key]['isFirstFile'] = $firstFileExists ? false : true;
+                            $firstFileExists = true;
+                        } else {
+                            $fileDuplicationsArray[$key]['exists'] = false;
+                        }
+                        $fileDuplicationsArray[$key]['fileFacade'] = new FileFacade($fileObject);
+                        $fileDuplicationsArray[$key]['fileReferences'] = $fileDuplication['fileReferences'];
+                    }
                 }
                 $this->view->assign('fileDuplications', $fileDuplicationsArray);
             }
+            // Assign data
+            $this->data['selection']['sha1'] = $sha1;
         }
+        // Assign data
+        $this->view->assign('data', $this->data);
     }
 
     /**
@@ -91,8 +104,11 @@ class FileDuplicationController extends AbstractFileController
         $replacedFiles = null;
         // Get request
         $sha1 = null;
-        if ($this->request->hasArgument('sha1')) {
-            $sha1 = $this->request->getArgument('sha1');
+        if ($this->request->hasArgument('selection')) {
+            $selection = $this->request->getArgument('selection');
+            if (isset($selection['sha1'])) {
+                $sha1 = $selection['sha1'];
+            }
         }
         if ($this->request->hasArgument('preferredFileUid')) {
             if (intval($this->request->getArgument('preferredFileUid'))) {
@@ -128,7 +144,7 @@ class FileDuplicationController extends AbstractFileController
                                 $sysFileReferences = $this->fileRepository->getSysFileReferences($fileObject);
                                 // Update file reference
                                 if (!empty($sysFileReferences)) {
-                                    $replacedFiles[$fileObject->getUid()]['sysFileReferences'] = [];
+                                    $replacedFiles[$fileObject->getUid()]['fileferences'] = [];
                                     foreach ($sysFileReferences as $key => $fileReference) {
                                         // Replace uid_local with uid of preferred file uid
                                         $updateSysFileReferenceFieldsArray = ['uid_local' => $preferredFileObject->getUid()];
@@ -140,10 +156,13 @@ class FileDuplicationController extends AbstractFileController
                                 }
                             }
                             // Remove file from file system
-                            $movingResult = $this->updateUtility->moveFile(
-                                $this->getPathAbsolute($replacedFiles[$fileObject->getUid()]['sourcePath'], false),
-                                $this->getPathAbsolute($replacedFiles[$fileObject->getUid()]['targetPath'], true)
-                            );
+                            $source = $this->getPathAbsolute($replacedFiles[$fileObject->getUid()]['sourcePath'], false);
+                            $target = $this->getPathAbsolute($replacedFiles[$fileObject->getUid()]['targetPath'], true);
+                            if (file_exists($source)) {
+                                $this->updateUtility->moveFile($source, $target);
+                            } else {
+                                $replacedFiles[$fileObject->getUid()]['fileNotFound'] = $source;
+                            }
                             // Set file as missing in sys_file
                             $updateSysFileFieldsArray = ['missing' => 1];
                             $updateSysFileResult = $this->fileRepository->updateSysFile($fileObject->getUid(), $updateSysFileFieldsArray, true);

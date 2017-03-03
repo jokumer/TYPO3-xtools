@@ -143,14 +143,21 @@
 						<tbody>
 							<f:for each="{replacedFiles}" as="replacedFile" key="uid" iteration="i">
 								<tr class="{f:if(condition: i.isEven, then: 'even', else: 'odd')}" role="row">
-									<td>
+									<td class="{f:if(condition: replacedFile.fileNotFound, then: 'alert-warning', else: '')}">
 										{replacedFile.fileFacade.icon->f:format.raw()} {replacedFile.fileFacade.uid}
 									</td>
-									<td>
-										<b>From</b>: {replacedFile.sourcePath}<br/>
-										<b>To</b>: {replacedFile.targetPath}
+									<td class="{f:if(condition: replacedFile.fileNotFound, then: 'alert-warning', else: '')}">
+										<f:if condition="replacedFile.fileNotFound">
+											<f:then>
+												<b>File not found, could not move file. References updated nevertheless.</b>
+											</f:then>
+											<f:else>
+												<b>From</b>: {replacedFile.sourcePath}<br/>
+												<b>To</b>: {replacedFile.targetPath}
+											</f:else>
+										</f:if>
 									</td>
-									<td>
+									<td class="{f:if(condition: replacedFile.fileNotFound, then: 'alert-warning', else: '')}">
 										<f:if condition="{replacedFile.fileReferences}">
 											<f:then>
 												<f:for each="{replacedFile.fileReferences}" as="fileReference" key="fileReferenceUid" iteration="iteration">
