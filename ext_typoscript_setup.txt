@@ -1,0 +1,6 @@
+// BE Module configuration
+lib.tx_xtools.math = TEXT
+lib.tx_xtools.math {
+    current = 1
+    prioriCalc = 1
+}

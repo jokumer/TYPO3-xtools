@@ -1,8 +1,10 @@
 <f:layout name="Default"/>
 
 <f:section name="content">
-	<h2>File and folder permissions</h2>
 	<f:flashMessages/>
+	<h2>
+		<f:translate key="controller.fileAndFolderPermission.action.index"/>
+	</h2>
 	<h3>Action</h3>
 	<h4>Current selection:</h4>
 	<p>
@@ -14,7 +16,7 @@
 						{data.path.site}<b>{data.path.current.selected}</b>
 						<br/>
 						<b>Properties:</b>
-						<f:render partial="Toolbox/FileAndFolderPermission/DirectoryProperties"
+						<f:render partial="Toolbox/DirectoryProperties"
 							arguments="{directory:data.path.current.properties}"/>
 						<br/>
 						<div class="input-group">
@@ -65,8 +67,9 @@
 			</f:else>
 		</f:if>
 	</p>
-	<h3>Directoy list</h3>
+	<h3>Directories</h3>
 	<p>
-		<f:render partial="Toolbox/FileAndFolderPermission/DirectoryList" arguments="{list:data.selection, icons:data.icons}"/>
+		<f:render partial="Toolbox/DirectoryList"
+				  arguments="{list:data.selection.directory, icons:data.icons, showDirectoryProperties: 1}"/>
 	</p>
 </f:section>

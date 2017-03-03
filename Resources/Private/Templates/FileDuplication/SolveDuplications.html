@@ -1,0 +1,179 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+	xmlns:fl="http://typo3.org/ns/TYPO3/CMS/Filelist/ViewHelpers">
+<f:layout name="Default"/>
+
+<f:section name="content">
+	<f:flashMessages/>
+	<f:link.action
+			controller="FileDuplication"
+			action="index"
+			arguments="{selection:{storage:data.selection.storage.uid, directory:data.selection.path}}"
+			class="btn btn-info"
+			id="tx_xtools_btn_back_index">
+		Back to ../{data.selection.path}
+	</f:link.action>
+	<h2>
+		<f:translate key="controller.fileDuplication.action.index"/>
+	</h2>
+	<h3>Solved duplications</h3>
+	<f:if condition="{preferredFile}">
+		<f:then>
+			<h4>Preferred file:</h4>
+			<p>
+				The preferred file replaced duplicated files and changed file references which belongs.
+			</p>
+			<table class="t3-table t3-datatable">
+				<thead>
+					<tr role="row">
+						<th>Uid</th>
+						<th>Preview</th>
+						<th>Filename</th>
+						<th>Ref</th>
+						<th>Meta</th>
+						<th>Date (created, modify)</th>
+						<th>Path</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="odd" role="row">
+						<td style="white-space: nowrap">
+							<fl:link.clickMenuOnIcon table="{preferredFile.fileFacade.combinedIdentifier}">
+								{preferredFile.fileFacade.icon->f:format.raw()} {preferredFile.fileFacade.uid}
+							</fl:link.clickMenuOnIcon>
+						</td>
+						<td>
+							<f:if condition="{preferredFile.fileFacade.publicUrl}">
+								<f:then>
+									<a href="/{preferredFile.fileFacade.publicUrl}"
+									   target="_blank"
+									   title="{preferredFile.fileFacade.publicUrl}">
+										<f:if condition="{preferredFile.fileFacade.type} == 2">
+											<f:image image="{preferredFile.fileFacade.resource}"
+													 alt="{preferredFile.fileFacade.name}"
+													 treatIdAsReference="0"
+													 maxWidth="64"
+													 maxHeight="64"
+													 style="max-height:64px; max-width:64px;"/>
+										</f:if>
+									</a>
+								</f:then>
+								<f:else>
+									<span title="{preferredFile.fileFacade.publicUrl}">
+										NOT FOUND
+									</span>
+								</f:else>
+							</f:if>
+						</td>
+						<td>
+							<f:if condition="{preferredFile.fileFacade.publicUrl}">
+								<f:then>
+									<a href="/{preferredFile.fileFacade.publicUrl}"
+									   target="_blank"
+									   title="{preferredFile.fileFacade.publicUrl}">
+									{preferredFile.fileFacade.name}
+									</a>
+								</f:then>
+								<f:else>
+									<span title="{preferredFile.fileFacade.publicUrl}">
+										{preferredFile.fileFacade.name} NOT FOUND
+									</span>
+								</f:else>
+							</f:if>
+						</td>
+						<td>
+							<f:if condition="{f:count(subject:'{preferredFile.fileReferences}')}">
+								<f:then>
+									<span title="SELECT uid, uid_local, uid_foreign, tablenames, fieldname, table_local FROM sys_file_reference WHERE uid IN ({f:if(condition:'{iteration.isLast}', then:'{fileReference.uid}', else:'{fileReference.uid},') -> f:for(each:'{preferredFile.fileReferences}', as:'fileReference', iteration:'iteration')})">
+										<f:count subject="{preferredFile.fileReferences}"/>
+									</span>
+								</f:then>
+								<f:else>
+									-
+								</f:else>
+							</f:if>
+						</td>
+						<td>
+							<b>Title</b>:&nbsp;{preferredFile.fileFacade.properties.title}<br/>
+							<b>Description</b>:&nbsp;{preferredFile.fileFacade.properties.description}<br/>
+							<b>Keywords</b>:&nbsp;{preferredFile.fileFacade.properties.keywords}<br/>
+							<b>Caption</b>:&nbsp;{preferredFile.fileFacade.properties.caption}<br/>
+						</td>
+						<td>
+							<f:format.date format="Y.m.d. H:i">
+								{preferredFile.fileFacade.properties.creation_date}
+							</f:format.date> <em>File</em><br/>
+							<f:format.date format="Y.m.d. H:i">
+								{preferredFile.fileFacade.properties.modification_date}
+							</f:format.date> <em>File</em><br/>
+							<f:format.date format="Y.m.d. H:i">
+								{preferredFile.fileFacade.properties.crdate}
+							</f:format.date> <em>DB</em><br/>
+							<f:format.date format="Y.m.d. H:i">
+								{preferredFile.fileFacade.properties.tstamp}
+							</f:format.date> <em>DB</em><br/>
+						</td>
+						<td>
+							<f:if condition="{preferredFile.fileFacade.publicUrl}">
+								<f:then>
+									{preferredFile.fileFacade.publicUrl}
+								</f:then>
+								<f:else>
+									NOT FOUND
+								</f:else>
+							</f:if>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<f:if condition="{replacedFiles}">
+				<f:then>
+					<h4>Replaced files:</h4>
+					<p>
+						Files has been moved to {replacedFilesTargetPath}. A log file with all kind of informations belongs in this folder.<br/>
+						Filenames are prepended with preferred file uid and '__' this file uid '__'.
+					</p>
+					<table class="t3-table t3-datatable">
+						<thead>
+							<tr role="row">
+								<th>Uid</th>
+								<th>File</th>
+								<th>References</th>
+							</tr>
+						</thead>
+						<tbody>
+							<f:for each="{replacedFiles}" as="replacedFile" key="uid" iteration="i">
+								<tr class="{f:if(condition: i.isEven, then: 'even', else: 'odd')}" role="row">
+									<td>
+										{replacedFile.fileFacade.icon->f:format.raw()} {replacedFile.fileFacade.uid}
+									</td>
+									<td>
+										<b>From</b>: {replacedFile.sourcePath}<br/>
+										<b>To</b>: {replacedFile.targetPath}
+									</td>
+									<td>
+										<f:if condition="{replacedFile.fileReferences}">
+											<f:then>
+												<f:for each="{replacedFile.fileReferences}" as="fileReference" key="fileReferenceUid" iteration="iteration">
+													{f:if(condition:'{iteration.isLast}', then:'{fileReferenceUid}', else:'{fileReferenceUid},')}
+												</f:for>
+											</f:then>
+											<f:else>
+												NO REFERENCES
+											</f:else>
+										</f:if>
+									</td>
+								</tr>
+							</f:for>
+						</tbody>
+					</table>
+				</f:then>
+				<f:else>
+					<h4>NO REPLACED FILES</h4>
+				</f:else>
+			</f:if>
+		</f:then>
+		<f:else>
+			<h4>NO PREFERRED FILE</h4>
+		</f:else>
+	</f:if>
+</f:section>

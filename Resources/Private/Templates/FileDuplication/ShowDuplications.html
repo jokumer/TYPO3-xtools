@@ -1,0 +1,202 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+	xmlns:fl="http://typo3.org/ns/TYPO3/CMS/Filelist/ViewHelpers">
+<f:layout name="Default"/>
+
+<f:section name="content">
+	<f:flashMessages/>
+	<f:link.action
+			controller="FileDuplication"
+			action="index"
+			arguments="{selection:{storage:data.selection.storage.uid, directory:data.selection.path}}"
+			class="btn btn-info">
+		Back to ..{data.selection.path}
+	</f:link.action>
+	<h2>
+		<f:translate key="controller.fileDuplication.action.index"/>
+	</h2>
+	<h3>File and duplicates</h3>
+	<f:if condition="{fileDuplications}">
+		<f:then>
+			<p>
+				<f:if condition="{data.selection.storage}">
+					Storage [uid]: {data.selection.storage.name} [{data.selection.storage.uid}]<br/>
+				</f:if>
+				<f:if condition="{data.selection.path}">
+					Directory: {data.selection.path}<br/>
+				</f:if>
+				Files sha1: {fileDuplications.0.fileFacade.sha1}<br/>
+				Files count: <f:count subject="{fileDuplications}"/><br/>
+				<f:comment>(fileDuplications.0.fileFacade.size) already in Ki</f:comment>
+				File size: <f:format.bytes>{f:cObject(typoscriptObjectPath:'lib.tx_xtools.math', data:'{fileDuplications.0.fileFacade.size}*1024')}</f:format.bytes><br/>
+				Reduction: <f:format.bytes>{f:cObject(typoscriptObjectPath:'lib.tx_xtools.math', data:'({f:count(subject:\'{fileDuplications}\')}-1)*{fileDuplications.0.fileFacade.size}*1024')}</f:format.bytes>
+			</p>
+			<f:if condition="{f:count(subject:'{fileDuplications}')} > {extensionConfiguration.pagination_itemsPerPage}">
+				<f:then>
+					<f:widget.paginate objects="{fileDuplications}"
+									   as="results"
+									   configuration="{
+									       maximumNumberOfLinks: 20,
+									       itemsPerPage: '{extensionConfiguration.pagination_itemsPerPage}',
+									       insertAbove: 1,
+									       insertBelow: 1
+									   }">
+						<f:render section="list" arguments="{results:results, data:data}"/>
+					</f:widget.paginate>
+				</f:then>
+				<f:else>
+					<f:render section="list" arguments="{results:fileDuplications, data:data}"/>
+				</f:else>
+			</f:if>
+			<f:link.action controller="Toolbox"
+						   action="backup"
+						   arguments="{selection:{initiator:{action:'{actionName}', controller:'{controllerName}'}, tables:{0:'sys_file', 1:'sys_file_reference'}, storage:data.selection.storage.uid, directory:data.selection.path}, execute:0}"
+						   class="btn btn-info">
+				Want to backup of tables before any changes?
+			</f:link.action>
+		</f:then>
+		<f:else>
+			No files found!
+		</f:else>
+	</f:if>
+</f:section>
+
+<f:section name="list">
+	<p>Select preferred file and submit below, to replace file duplications and adapt their references. Ensure duplicated files are not used in any links!</p>
+	<f:form action="solveDuplications" controller="FileDuplication">
+		<f:form.hidden name="sha1" value="{results.0.fileFacade.sha1}"/>
+		<f:form.hidden name="selection[storage]" value="{data.selection.storage.uid}"/>
+		<f:form.hidden name="selection[path]" value="{data.selection.path}"/>
+		<table class="t3-table t3-datatable">
+			<thead>
+				<tr role="row">
+					<th><span title="Preferred file for replacement(s)">&#10004;</span></th>
+					<th>Uid</th>
+					<th>Preview</th>
+					<th>Filename</th>
+					<th>
+						<span title="SELECT sr.tablename,sr.recuid,sr.field,sr.deleted,sr.ref_table,sr.ref_uid,sfr.uid, sfr.uid_local, sfr.uid_foreign, sfr.tablenames, sfr.fieldname, sfr.table_local FROM sys_refindex AS sr LEFT JOIN sys_file_reference AS sfr ON sr.tablename = 'sys_file_reference' AND sr.recuid = sfr.uid WHERE 1=1 AND sr.ref_table LIKE 'sys_file' AND sr.ref_uid IN ({f:if(condition:'{i.isLast}', then:'{file.fileFacade.uid}', else:'{file.fileFacade.uid},') -> f:for(each:'{results}', as:'file', iteration:'i')}) ORDER BY sr.ref_uid;">
+							Ref
+						</span>
+					</th>
+					<th>Meta</th>
+					<th>Date (created, modify)</th>
+					<th>Path</th>
+				</tr>
+			</thead>
+			<tbody>
+			<f:for each="{results}" as="fileDuplication" iteration="i">
+				<tr class="{f:if(condition: i.isEven, then: 'even', else: 'odd')}"
+					role="row">
+					<td>
+						<f:if condition="{i.isFirst}">
+							<f:then>
+								<f:if condition="{fileDuplication.fileFacade.publicUrl}">
+									<f:form.radio id="preferred-file-selection-{fileDuplication.fileFacade.uid}"
+										  name="preferredFileUid"
+										  value="{fileDuplication.fileFacade.uid}"
+										  additionalAttributes="{checked:'checked'}"/>
+								</f:if>
+							</f:then>
+							<f:else>
+								<f:if condition="{fileDuplication.fileFacade.publicUrl}">
+									<f:form.radio id="preferred-file-selection-{fileDuplication.fileFacade.uid}"
+										  name="preferredFileUid"
+										  value="{fileDuplication.fileFacade.uid}"/>
+								</f:if>
+							</f:else>
+						</f:if>
+					</td>
+					<td style="white-space: nowrap">
+						<fl:link.clickMenuOnIcon table="{fileDuplication.fileFacade.combinedIdentifier}">
+							{fileDuplication.fileFacade.icon->f:format.raw()} {fileDuplication.fileFacade.uid}
+						</fl:link.clickMenuOnIcon>
+					</td>
+					<td>
+						<f:if condition="{fileDuplication.fileFacade.publicUrl}">
+							<f:then>
+								<a href="{fileDuplication.fileFacade.publicUrl}"
+								   target="_blank"
+								   title="{fileDuplication.fileFacade.publicUrl}">
+									<f:if condition="{fileDuplication.fileFacade.type} == 2">
+										<f:image
+												image="{fileDuplication.fileFacade.resource}"
+												alt="{fileDuplication.fileFacade.name}"
+												treatIdAsReference="0"
+												maxWidth="64"
+												maxHeight="64"
+												style="max-height:64px; max-width:64px;"/>
+									</f:if>
+								</a>
+							</f:then>
+							<f:else>
+								<span title="{fileDuplication.fileFacade.publicUrl}">
+									NOT FOUND
+								</span>
+							</f:else>
+						</f:if>
+					</td>
+					<td>
+						<f:if condition="{fileDuplication.fileFacade.publicUrl}">
+							<f:then>
+								<a href="{fileDuplication.fileFacade.publicUrl}"
+								   target="_blank"
+								   title="{fileDuplication.fileFacade.publicUrl}">
+									{fileDuplication.fileFacade.name}
+								</a>
+							</f:then>
+							<f:else>
+									{fileDuplication.fileFacade.name} NOT FOUND
+							</f:else>
+						</f:if>
+					</td>
+					<td>
+						<f:if condition="{f:count(subject:'{fileDuplication.fileReferences}')}">
+							<f:then>
+								<span title="SELECT uid, uid_local, uid_foreign, tablenames, fieldname, table_local FROM sys_file_reference WHERE uid IN ({f:if(condition:'{iteration.isLast}', then:'{fileReference.uid}', else:'{fileReference.uid},') -> f:for(each:'{fileDuplication.fileReferences}', as:'fileReference', iteration:'iteration')})">
+									<f:count subject="{fileDuplication.fileReferences}"/>
+								</span>
+							</f:then>
+							<f:else>
+								-
+							</f:else>
+						</f:if>
+					</td>
+					<td>
+						<b>Title</b>:&nbsp;{fileDuplication.fileFacade.properties.title}<br/>
+						<b>Description</b>:&nbsp;{fileDuplication.fileFacade.properties.description}<br/>
+						<b>Keywords</b>:&nbsp;{fileDuplication.fileFacade.properties.keywords}<br/>
+						<b>Caption</b>:&nbsp;{fileDuplication.fileFacade.properties.caption}<br/>
+					</td>
+					<td>
+						<f:format.date format="Y.m.d. H:i">
+							{fileDuplication.fileFacade.properties.creation_date}
+						</f:format.date> <em>File</em><br/>
+						<f:format.date format="Y.m.d. H:i">
+							{fileDuplication.fileFacade.properties.modification_date}
+						</f:format.date> <em>File</em><br/>
+						<f:format.date format="Y.m.d. H:i">
+							{fileDuplication.fileFacade.properties.crdate}
+						</f:format.date> <em>DB</em><br/>
+						<f:format.date format="Y.m.d. H:i">
+							{fileDuplication.fileFacade.properties.tstamp}
+						</f:format.date> <em>DB</em><br/>
+					</td>
+					<td>
+						<f:if condition="{fileDuplication.fileFacade.publicUrl}">
+							<f:then>
+								{fileDuplication.fileFacade.publicUrl}
+							</f:then>
+							<f:else>
+								NOT FOUND
+							</f:else>
+						</f:if>
+					</td>
+				</tr>
+			</f:for>
+			</tbody>
+		</table>
+		<f:form.submit id="tx_xtools_btn_replace"
+					   value="Replace"
+					   class="btn btn-danger" />
+	</f:form>
+</f:section>

@@ -1,0 +1,47 @@
+<f:if condition="{list.directories}">
+	<f:then>
+		<ul style="list-style-type: none;">
+			<f:for each="{list.directories}" as="directory">
+				<li>
+					<f:if condition="{list.selection.directory} == {directory.name}">
+						<f:then>
+							{icons.apps-filetree-folder-opened}
+							<f:link.action arguments="{selection:{storage:storage.uid, directory:directory.name, path:list.path}}">
+								<b>{directory.name}</b>
+							</f:link.action>
+							<f:if condition="{showDirectoryProperties}">
+								<i style="color: grey;">
+									[ <f:render partial="Toolbox/DirectoryProperties"
+												arguments="{storage:storage, directory:directory}"/> ]
+								</i>
+							</f:if>
+							<f:render partial="Toolbox/DirectoryList"
+									  arguments="{storage:storage, list:list.selection, icons:icons, showDirectoryProperties:showDirectoryProperties}"/>
+						</f:then>
+						<f:else>
+							{icons.apps-filetree-folder-default}
+							<f:link.action arguments="{selection:{storage:storage.uid, directory:directory.name, path:list.path}}">
+								{directory.name}
+							</f:link.action>
+							<f:if condition="{showDirectoryProperties}">
+								<i style="color: grey;">
+									[ <f:render partial="Toolbox/DirectoryProperties"
+												arguments="{storage:storage, directory:directory}"/> ]
+								</i>
+							</f:if>
+						</f:else>
+					</f:if>
+				</li>
+			</f:for>
+		</ul>
+	</f:then>
+	<f:else>
+		<ul style="list-style-type: none;">
+			<li>
+				<i style="color: grey;">
+					No subdirectories
+				</i>
+			</li>
+		</ul>
+	</f:else>
+</f:if>

@@ -1,0 +1,48 @@
+<f:if condition="{data.list.storages}">
+	<f:then>
+		<ul style="list-style-type: none;">
+			<f:for each="{data.list.storages}" as="storage">
+				<li>
+					<f:if condition="{storage.is_online}">
+						<f:then>
+							<f:if condition="{data.selection.storage.uid} == {storage.uid}">
+								<f:then>
+									{data.icons.apps-filetree-folder-opened}
+									<f:link.action
+											arguments="{selection:{storage:storage.uid, directory:''}}"
+											title="{storage.description}">
+										<b>{storage.name}</b> [{storage.uid}]
+									</f:link.action>
+									<f:if condition="{data.list.directories}">
+										<f:render partial="Toolbox/FileDuplication/DirectoryList" arguments="{_all}"/>
+									</f:if>
+								</f:then>
+								<f:else>
+									{data.icons.apps-filetree-folder-default}
+									<f:link.action
+											arguments="{selection:{storage:storage.uid, directory:''}}"
+											title="{storage.description}">
+										{storage.name} [{storage.uid}]
+									</f:link.action>
+								</f:else>
+							</f:if>
+						</f:then>
+						<f:else>
+							{data.icons.apps-filetree-folder-locked}
+							{storage.name} [{storage.uid}]
+						</f:else>
+					</f:if>
+				</li>
+			</f:for>
+		</ul>
+	</f:then>
+	<f:else>
+		<ul style="list-style-type: none;">
+			<li>
+				<i style="color: grey;">
+					No storages found!
+				</i>
+			</li>
+		</ul>
+	</f:else>
+</f:if>

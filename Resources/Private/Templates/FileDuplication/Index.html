@@ -1,0 +1,167 @@
+<f:layout name="Default"/>
+
+<f:section name="content">
+	<f:flashMessages/>
+	<h2>
+		<f:translate key="controller.fileDuplication.action.index"/>
+	</h2>
+	<f:if condition="{data.selection.storage}">
+		<f:link.action controller="Toolbox"
+					   action="backup"
+					   arguments="{selection:{initiator:{action:'{actionName}', controller:'{controllerName}'},tables:{0:'sys_file', 1:'sys_file_reference'}},execute:0}"
+					   class="btn btn-info">
+			Want to backup of tables?
+		</f:link.action>
+	</f:if>
+	<h3>Storages</h3>
+	<f:if condition="{data.list.storages}">
+		<f:then>
+			<f:render partial="Toolbox/FileDuplication/StorageList" arguments="{_all}"/>
+			<f:if condition="{data.selection.storage}">
+				<f:then>
+					<f:render section="directories" arguments="{_all}"/>
+					<f:render section="filesDuplications" arguments="{_all}"/>
+				</f:then>
+				<f:else>
+					Select a storage above to find duplications.
+				</f:else>
+			</f:if>
+		</f:then>
+		<f:else>
+			No storages found!
+		</f:else>
+	</f:if>
+</f:section>
+
+<f:section name="directories">
+	<h3>Directories</h3>
+	<f:if condition="{data.selection.storage}">
+		<f:then>
+			<f:render partial="Toolbox/DirectoryList"
+					  arguments="{storage:data.selection.storage, list:data.selection.directory, icons:data.icons}"/>
+		</f:then>
+		<f:else>
+			No directories found! Please select a storage.
+		</f:else>
+	</f:if>
+</f:section>
+
+<f:section name="filesDuplications">
+	<h3>Files and duplications</h3>
+	<f:if condition="{filesDuplications}">
+		<f:then>
+			<p>
+				Files count:
+				<f:count subject="{filesDuplications}"/>
+			</p>
+			<f:if condition="{f:count(subject:'{filesDuplications}')} > {extensionConfiguration.pagination_itemsPerPage}">
+				<f:then>
+					<f:widget.paginate objects="{filesDuplications}"
+									   as="results"
+									   configuration="{
+									       maximumNumberOfLinks: 20,
+									       itemsPerPage: '{extensionConfiguration.pagination_itemsPerPage}',
+									       insertAbove: 1,
+									       insertBelow: 1
+									   }">
+						<f:render section="list_filesDuplication" arguments="{results:results, data:data}"/>
+					</f:widget.paginate>
+				</f:then>
+				<f:else>
+					<f:render section="list_filesDuplication" arguments="{results:filesDuplications, data:data}"/>
+				</f:else>
+			</f:if>
+		</f:then>
+		<f:else>
+			No duplications found!
+			<f:if condition="{data.selection.storage}">
+				<f:then></f:then>
+				<f:else>
+					Please select a storage.
+				</f:else>
+			</f:if>
+		</f:else>
+	</f:if>
+</f:section>
+
+<f:section name="list_filesDuplication">
+	<table class="t3-table t3-datatable">
+		<thead>
+			<tr role="row">
+				<th>Count</th>
+				<th>Preview</th>
+				<th>File (first found)</th>
+				<th>Type</th>
+				<th>Sha1</th>
+				<th>Size</th>
+			</tr>
+		</thead>
+		<tbody>
+		<f:for each="{results}" as="filesDuplication" iteration="i">
+			<tr class="{f:if(condition: i.isEven, then: 'even', else: 'odd')}"
+				role="row">
+				<td>
+					<f:link.action action="showDuplications"
+								   controller="FileDuplication"
+								   arguments="{
+								       selection:{storage:data.selection.storage.uid, directory:data.selection.path},
+								       sha1:filesDuplication.sha1
+								   }"
+								   id="tx_xtools_ahref_first_duplication">
+						<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-open.svg" width="16"
+							 height="16">
+						<strong>{filesDuplication.totalCount}</strong>
+					</f:link.action>
+				</td>
+				<td>
+					<f:if condition="{filesDuplication.uid}">
+						<f:then>
+							<a href="{f:uri.image(src:filesDuplication.uid, treatIdAsReference:0)}"
+							   target="_blank"
+							   title="{f:uri.image(src:filesDuplication.uid, treatIdAsReference:0)}">
+								<f:if condition="{filesDuplication.type} == 2">
+									<f:image
+											src="{filesDuplication.uid}"
+											alt="{filesDuplication.name}"
+											treatIdAsReference="0"
+											maxWidth="64"
+											maxHeight="64"
+											style="max-height:64px; max-width:64px;"/>
+								</f:if>
+							</a>
+						</f:then>
+						<f:else>
+							<span title="{filesDuplication.publicUrl}">NOT FOUND</span>
+						</f:else>
+					</f:if>
+				</td>
+				<td>
+					<f:if condition="{filesDuplication.uid}">
+						<f:then>
+							<a href="{f:uri.image(src:filesDuplication.uid, treatIdAsReference:0)}"
+							   target="_blank"
+							   title="{f:uri.image(src:filesDuplication.uid, treatIdAsReference:0)}">
+								{filesDuplication.name}
+							</a>
+						</f:then>
+						<f:else>
+							NOT FOUND
+						</f:else>
+					</f:if>
+				</td>
+				<td>
+					{filesDuplication.type}
+				</td>
+				<td>
+					<em>{filesDuplication.sha1}</em>
+				</td>
+				<td>
+					File size: {filesDuplication.size -> f:format.bytes()} <br/>
+					Reduction: {f:cObject(typoscriptObjectPath:'lib.tx_xtools.math',
+					data:'({filesDuplication.totalCount}-1)*{filesDuplication.size}') -> f:format.bytes()}
+				</td>
+			</tr>
+		</f:for>
+		</tbody>
+	</table>
+</f:section>

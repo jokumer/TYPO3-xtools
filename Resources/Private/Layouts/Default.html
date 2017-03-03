@@ -1,5 +1,6 @@
 <f:be.container
-	enableClickMenu="false"
+	includeCssFiles="{0:'{f:uri.resource(path:\'Css/backend.css\')}'}"
+	enableClickMenu="true"
 	loadExtJs="false"
 	loadExtJsTheme="false"
 	enableExtJsDebug="false">
@@ -14,8 +15,22 @@
 							<button onclick="history.back()" class="btn btn-sm btn-info">back</button>
 							-->
 						</f:comment>
-						<button onclick="location.reload()" class="btn btn-sm btn-info">Reload</button>
-						<f:render partial="Toolbox/FileAndFolderPermission/Info"/>
+						<f:link.action controller="Toolbox" action="index" class="btn btn-sm btn-info">
+							Main menu
+						</f:link.action>
+						<button onclick="location.reload()" class="btn btn-sm btn-info">
+							Reload
+						</button>
+						<f:switch expression="{controllerName}">
+							<f:case value="Toolbox">
+							</f:case>
+							<f:case value="FileAndFolderPermission">
+								<f:render partial="Toolbox/FileAndFolderPermission/Info"/>
+							</f:case>
+							<f:case value="FileDuplication">
+								<f:render partial="Toolbox/FileDuplication/Info"/>
+							</f:case>
+						</f:switch>
 					</div>
 				</div>
 			</div>

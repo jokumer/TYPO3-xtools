@@ -1,0 +1,63 @@
+ul.f3-widget-paginator {
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+    list-style-type: none;
+}
+ul.f3-widget-paginator li {
+    float: left;
+    display: block;
+    background-color: #fff;
+    border: 1px solid #589edc;
+    border-radius: 0;
+    color: #000;
+    margin: 0 -1px 0 0;
+    padding: 5px 10px;
+    line-height: normal;
+}
+ul.f3-widget-paginator li.previous,
+ul.f3-widget-paginator li.next {
+    background-color: #6daae0;
+    border: 1px solid #589edc;
+    border-radius: 2px;
+    color: #fff;
+}
+ul.f3-widget-paginator li:first-child {
+    border-radius: 2px 0 0 2px;
+}
+ul.f3-widget-paginator li:last-child {
+    border-radius: 0 2px 2px 0;
+}
+ul.f3-widget-paginator li.current {
+    background-color: #dddddd;
+    border-color: #999999;
+    color: #000;
+}
+ul.f3-widget-paginator li.disabled {
+    padding: 5px 10px;
+}
+ul.f3-widget-paginator li a {
+    color: #4074a2;
+    display: inline-block;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    padding: 1em;
+    margin: -1em;
+}
+ul.f3-widget-paginator li.previous a,
+ul.f3-widget-paginator li.next a {
+    color: #fff;
+}
+ul.f3-widget-paginator li a:hover {
+    color: #000;
+    text-decoration: none;
+}
+ul.f3-widget-paginator li.next {
+    margin-right: 15px;
+}
+.table > thead > tr > td,
+.table > tbody > tr > td,
+.table > tfoot > tr > td {
+    vertical-align: top;
+}

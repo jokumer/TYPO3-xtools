@@ -1,0 +1,4 @@
+# cat=Xtools/1; type=integer; label=Default max items shown in paginations, default is 50
+pagination_itemsPerPage = 10
+# cat=Xtools/2; type=string; label=Backup path, default is typo3temp/tx_xtools/
+backup_path = typo3temp/tx_xtools/

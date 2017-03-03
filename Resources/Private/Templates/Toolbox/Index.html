@@ -1,6 +1,36 @@
-<f:layout name="Default" />
+<f:layout name="Default"/>
 
 <f:section name="content">
-	<h2>Index action</h2>
-	<f:flashMessages />
+	<f:flashMessages/>
+	<h2>Main tasks</h2>
+	<h3>
+		<f:link.action controller="FileAndFolderPermission"
+					   action="index">
+			<f:translate key="controller.fileAndFolderPermission.action.index"/>
+		</f:link.action>
+	</h3>
+	<p>
+		Shows file and folder permissions and offers possibility to fix them, using TYPO3 permission settings.
+		<br/>
+		<f:link.action controller="FileAndFolderPermission"
+					   action="index"
+					   class="btn btn-success">
+			<f:translate key="controller.fileAndFolderPermission.action.index"/>
+		</f:link.action>
+	</p>
+	<h3>
+		<f:link.action controller="FileDuplication"
+					   action="index">
+			<f:translate key="controller.fileDuplication.action.index"/>
+		</f:link.action>
+	</h3>
+	<p>
+		Shows file duplications and offers possibility to fix them.
+		<br/>
+		<f:link.action controller="FileDuplication"
+					   action="index"
+					   class="btn btn-success">
+			<f:translate key="controller.fileDuplication.action.index"/>
+		</f:link.action>
+	</p>
 </f:section>
