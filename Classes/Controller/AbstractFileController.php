@@ -266,6 +266,7 @@ class AbstractFileController extends AbstractController
                 $path = '';
             }
         }
+        $path = $this->removeUnnecassarySlash($path);
         return $path;
     }
 
@@ -273,12 +274,13 @@ class AbstractFileController extends AbstractController
      * Get path absolute
      *
      * @param string $path
+     * @param bool $ignoreCurrentPathRoot dont add current root path (fx from storage) useful when move files to absolute path
      * @return string $path
      */
-    protected function getPathAbsolute($path)
+    protected function getPathAbsolute($path, $ignoreCurrentPathRoot = false)
     {
         $pos1 = strpos($path, $this->currentPathRoot);
-        if ($pos1 === false) {
+        if ($pos1 === false && $ignoreCurrentPathRoot === false) {
             $path = $this->currentPathRoot . $path;
         }
         $pos2 = strpos($path, PATH_site);

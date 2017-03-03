@@ -127,7 +127,7 @@
 				<f:then>
 					<h4>Replaced files:</h4>
 					<p>
-						Files has been moved to {replacedFilesTargetPath}, where a log file belongs.
+						Files has been moved to {replacedFilesTargetPath} prepended with file uid. A log file with all kind of informations belongs in this folder.
 					</p>
 					<table class="t3-table t3-datatable">
 						<theader>
@@ -141,10 +141,11 @@
 							<f:for each="{replacedFiles}" as="replacedFile" key="uid" iteration="i">
 								<tr class="{f:if(condition: i.isEven, then: 'even', else: 'odd')}" role="row">
 									<td>
-										{uid}
+										{replacedFile.fileObject.uid}
 									</td>
 									<td>
-										{replacedFile.identifier}
+										<b>From</b>: {replacedFile.sourcePath}<br/>
+										<b>To</b>: {replacedFile.targetPath}
 									</td>
 									<td>
 										<f:if condition="{replacedFile.sysFileReferences}">
@@ -154,7 +155,7 @@
 												</f:for>
 											</f:then>
 											<f:else>
-												
+												NO REFERENCES
 											</f:else>
 										</f:if>
 									</td>
