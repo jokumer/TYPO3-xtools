@@ -2,18 +2,35 @@
 
 <f:section name="content">
 	<f:flashMessages/>
-	<ul>
-		<li>
-			<f:link.action controller="FileAndFolderPermission" action="index">
-				<f:translate key="controller.fileAndFolderPermission.action.index"/>
-			</f:link.action>
-			<f:render partial="Toolbox/FileAndFolderPermission/Info"/>
-		</li>
-		<li>
-			<f:link.action controller="FileDuplication" action="index">
-				<f:translate key="controller.fileDuplication.action.index"/>
-			</f:link.action>
-			<f:render partial="Toolbox/FileDuplication/Info"/>
-		</li>
-	</ul>
+	<h2>Main tasks</h2>
+	<h3>
+		<f:link.action controller="FileAndFolderPermission"
+					   action="index">
+			<f:translate key="controller.fileAndFolderPermission.action.index"/>
+		</f:link.action>
+	</h3>
+	<p>
+		Shows file and folder permissions and offers possibility to fix them, using TYPO3 permission settings.
+		<br/>
+		<f:link.action controller="FileAndFolderPermission"
+					   action="index"
+					   class="btn btn-success">
+			<f:translate key="controller.fileAndFolderPermission.action.index"/>
+		</f:link.action>
+	</p>
+	<h3>
+		<f:link.action controller="FileDuplication"
+					   action="index">
+			<f:translate key="controller.fileDuplication.action.index"/>
+		</f:link.action>
+	</h3>
+	<p>
+		Shows file duplications and offers possibility to fix them.
+		<br/>
+		<f:link.action controller="FileDuplication"
+					   action="index"
+					   class="btn btn-success">
+			<f:translate key="controller.fileDuplication.action.index"/>
+		</f:link.action>
+	</p>
 </f:section>
