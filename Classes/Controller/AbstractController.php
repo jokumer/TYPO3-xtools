@@ -49,6 +49,7 @@ class AbstractController extends ActionController
     {
         parent::__construct();
         $this->updateUtility = GeneralUtility::makeInstance(UpdateUtility::class);
+        $this->initializeExtensionConfiguration();
     }
 
     /**
@@ -74,7 +75,6 @@ class AbstractController extends ActionController
         $view->assign('controllerName', $this->request->getControllerName());
         $view->assign('actionName', $this->request->getControllerActionName());
         // Assign extension configuration
-        $this->initializeExtensionConfiguration();
         $view->assign('extensionConfiguration', $this->extensionConfiguration);
     }
 

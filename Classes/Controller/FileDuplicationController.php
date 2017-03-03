@@ -108,7 +108,7 @@ class FileDuplicationController extends AbstractFileController
                 // Replace each duplicated file with preferred file in sys_file_reference
                 if (!empty($fileDuplications)) {
                     // @todo: make backup path configurable
-                    $replacedFilesTargetPath = PATH_site . 'typo3temp/tx_xtools/' . $executionTime . '/';
+                    $replacedFilesTargetPath = PATH_site . $this->extensionConfigurationBackupPath . $executionTime . '/';
                     $mkdir = GeneralUtility::mkdir_deep($replacedFilesTargetPath);
                     if ($mkdir !== false) {
                         $replacedFiles = [];

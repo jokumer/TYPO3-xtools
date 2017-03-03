@@ -68,6 +68,13 @@ class AbstractFileController extends AbstractController
     protected $currentPathSelected = null;
 
     /**
+     * Extension configuration backup path
+     *
+     * @var string
+     */
+    protected $extensionConfigurationBackupPath = 'typo3temp/tx_xtools/';
+
+    /**
      * Inject FileRepository
      *
      * @param FileRepository $fileRepository
@@ -117,11 +124,12 @@ class AbstractFileController extends AbstractController
                 $currentPathRoot = '';
             }
         }
-        if (substr($currentPathRoot, -1) != '/') {
-            $currentPathRoot .= '/';
-        }
+        $currentPathRoot = $this->appendSlashIfMissing($currentPathRoot);
         $this->currentPathRoot = $this->getPathRelative($currentPathRoot);
         $this->currentPathSelected = $this->getCurrentPathSelected();
+        if (isset($this->extensionConfiguration['backup_path'])) {
+            $this->extensionConfigurationBackupPath = $this->appendSlashIfMissing($this->extensionConfiguration['backup_path']);
+        }
     }
 
     /**
@@ -170,7 +178,7 @@ class AbstractFileController extends AbstractController
             $selectedLevels = GeneralUtility::trimExplode('/', $this->currentPathSelected);
             if (!empty($selectedLevels)) {
                 foreach ($selectedLevels as $selectedLevelKey => $selectedLevelDirectory) {
-                    $relativePath .= $selectedLevelDirectory . '/';
+                    $relativePath = $this->appendSlashIfMissing($relativePath);
                     $directoryListData = $this->addListSelection($directoryListData, $relativePath, $selectedLevelDirectory);
                 }
             }
@@ -277,8 +285,7 @@ class AbstractFileController extends AbstractController
         if ($pos2 === false) {
             $path = PATH_site . $path;
         }
-        // remove unnecessary slashes
-        $path = preg_replace('#/+#','/', $path);
+        $path = $this->removeUnnecassarySlash($path);
         return $path;
     }
 
@@ -313,5 +320,46 @@ class AbstractFileController extends AbstractController
     protected function getAvailableStorages()
     {
         return $this->fileRepository->getStorages();
+    }
+
+    /**
+     * Append slash if missing
+     *
+     * @param string $path
+     * @return string $path
+     */
+    protected function appendSlashIfMissing($path = '')
+    {
+        if (substr($path, -1) != '/') {
+            $path .= '/';
+        }
+        return $path;
+    }
+
+    /**
+     * Prepend slash if missing
+     *
+     * @param string $path
+     * @return string $path
+     */
+    protected function prependSlashIfMissing($path = '')
+    {
+        if (substr($path, 1) != '/') {
+            $path = '/' . $path;
+        }
+        return $path;
+    }
+
+    /**
+     * Remove unnecassary slash
+     * Changes from '//' to '/'
+     *
+     * @param string $path
+     * @return string $path
+     */
+    protected function removeUnnecassarySlash($path = '')
+    {
+        $path = preg_replace('#/+#','/', $path);
+        return $path;
     }
 }
