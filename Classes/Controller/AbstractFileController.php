@@ -178,7 +178,7 @@ class AbstractFileController extends AbstractController
             $selectedLevels = GeneralUtility::trimExplode('/', $this->currentPathSelected);
             if (!empty($selectedLevels)) {
                 foreach ($selectedLevels as $selectedLevelKey => $selectedLevelDirectory) {
-                    $relativePath = $this->appendSlashIfMissing($relativePath);
+                    $relativePath .= $this->appendSlashIfMissing($selectedLevelDirectory);
                     $directoryListData = $this->addListSelection($directoryListData, $relativePath, $selectedLevelDirectory);
                 }
             }
