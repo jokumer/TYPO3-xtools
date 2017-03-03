@@ -101,7 +101,7 @@ class FileDuplicationController extends AbstractFileController
                 if ($preferredFileObject instanceof File) {
                     $preferredFile = [
                         'fileFacade' => new FileFacade($preferredFileObject),
-                        'fileReferences' => $this->fileRepository->getSysFileReferences($preferredFileObject)
+                        'fileReferences' => $this->fileRepository->getSysFileReferences($preferredFileObject) // not persisted yet!
                     ];
                 }
             }
@@ -168,10 +168,14 @@ class FileDuplicationController extends AbstractFileController
         }
         // Assign data
         $this->view->assign('data', $this->data);
-        $this->view->assign('preferredFile', $preferredFile);
         $this->view->assign('replacedFiles', $replacedFiles);
         $this->view->assign('executionTime', $executionTime);
         $this->view->assign('replacedFilesTargetPath', $replacedFilesTargetPath);
+        $persistenceManager = $this->objectManager->get(\TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager::class);
+        // Assign persited preferred file
+        $persistenceManager->persistAll();
+        $preferredFile['fileReferences'] = $this->fileRepository->getSysFileReferences($preferredFileObject);
+        $this->view->assign('preferredFile', $preferredFile);
     }
 
     /**
