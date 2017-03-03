@@ -67,8 +67,8 @@
 		<f:form.hidden name="selection[storage]" value="{data.selection.storage.uid}"/>
 		<f:form.hidden name="selection[path]" value="{data.selection.path}"/>
 		<table class="t3-table t3-datatable">
-			<theader>
-				<tr>
+			<thead>
+				<tr role="row">
 					<th><span title="Preferred file for replacement(s)">&#10004;</span></th>
 					<th>Uid</th>
 					<th>Preview</th>
@@ -82,7 +82,7 @@
 					<th>Date (created, modify)</th>
 					<th>Path</th>
 				</tr>
-			</theader>
+			</thead>
 			<tbody>
 			<f:for each="{results}" as="fileDuplication" iteration="i">
 				<tr class="{f:if(condition: i.isEven, then: 'even', else: 'odd')}"

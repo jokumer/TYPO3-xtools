@@ -23,8 +23,8 @@
 				The preferred file replaced duplicated files and changed file references which belongs.
 			</p>
 			<table class="t3-table t3-datatable">
-				<theader>
-					<tr>
+				<thead>
+					<tr role="row">
 						<th>Uid</th>
 						<th>Preview</th>
 						<th>Filename</th>
@@ -33,7 +33,7 @@
 						<th>Date (created, modify)</th>
 						<th>Path</th>
 					</tr>
-				</theader>
+				</thead>
 				<tbody>
 					<tr class="odd" role="row">
 						<td>
@@ -130,13 +130,13 @@
 						Files has been moved to {replacedFilesTargetPath} prepended with file uid. A log file with all kind of informations belongs in this folder.
 					</p>
 					<table class="t3-table t3-datatable">
-						<theader>
-							<tr>
+						<thead>
+							<tr role="row">
 								<th>Uid</th>
 								<th>File</th>
 								<th>References</th>
 							</tr>
-						</theader>
+						</thead>
 						<tbody>
 							<f:for each="{replacedFiles}" as="replacedFile" key="uid" iteration="i">
 								<tr class="{f:if(condition: i.isEven, then: 'even', else: 'odd')}" role="row">

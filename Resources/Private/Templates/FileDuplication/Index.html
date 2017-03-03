@@ -86,8 +86,8 @@
 
 <f:section name="list_filesDuplication">
 	<table class="t3-table t3-datatable">
-		<theader>
-			<tr>
+		<thead>
+			<tr role="row">
 				<th>Count</th>
 				<th>Preview</th>
 				<th>File (first found)</th>
@@ -95,7 +95,7 @@
 				<th>Sha1</th>
 				<th>Size</th>
 			</tr>
-		</theader>
+		</thead>
 		<tbody>
 		<f:for each="{results}" as="filesDuplication" iteration="i">
 			<tr class="{f:if(condition: i.isEven, then: 'even', else: 'odd')}"
