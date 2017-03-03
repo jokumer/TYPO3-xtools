@@ -731,7 +731,9 @@ class UpdateUtility
         } catch (\Exception $result) {
             if ($result === false) {
                 // @todo: handle errors, wrong charsets in file path would not work...
-                #throw new \RuntimeException('Moving file ' . $sourcePath . ' to ' . $targetIdentifier . ' failed.', 1488329692);
+                $message = 'Moving file ' . $source . ' to ' . $target . ' failed.';
+                $this->logMessage($message, 2);
+                #throw new \RuntimeException($message, 1488329692);
             }
         }
         return $result;
