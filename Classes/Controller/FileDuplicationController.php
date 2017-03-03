@@ -70,7 +70,7 @@ class FileDuplicationController extends AbstractFileController
                 $fileDuplicationsArray = [];
                 foreach ($fileDuplications as $key => $fileDuplication) {
                     $fileDuplicationsArray[$count]['fileFacade'] = new FileFacade($fileDuplication['fileObject']);
-                    $fileDuplicationsArray[$count]['references'] = $fileDuplication['references'];
+                    $fileDuplicationsArray[$count]['fileReferences'] = $fileDuplication['fileReferences'];
                     $count++;
                 }
                 $this->view->assign('fileDuplications', $fileDuplicationsArray);
@@ -86,81 +86,83 @@ class FileDuplicationController extends AbstractFileController
     public function solveDuplicationsAction()
     {
         $executionTime = $GLOBALS['EXEC_TIME'];
-        $preferredFileUid = null;
+        $preferredFileObject = null;
         $preferredFile = null;
         $replacedFiles = null;
-        $replacedFileReferences = null;
         // Get request
-        if ($this->request->hasArgument('preferredFileUid')) {
-            $preferredFileUid = intval($this->request->getArgument('preferredFileUid'));
-            $preferredFile = new FileFacade($this->fileRepository->getFileObject($preferredFileUid));
-        }
         $sha1 = null;
         if ($this->request->hasArgument('sha1')) {
             $sha1 = $this->request->getArgument('sha1');
         }
+        if ($this->request->hasArgument('preferredFileUid')) {
+            // @todo: !!!!!!!!!!! if uid then always use from fileObject instead this one
+            if (intval($this->request->getArgument('preferredFileUid'))) {
+                $preferredFileObject = $this->fileRepository->getFileObject(intval($this->request->getArgument('preferredFileUid')));
+                if ($preferredFileObject instanceof File) {
+                    $preferredFile = [
+                        'fileFacade' => new FileFacade($preferredFileObject),
+                        'fileReferences' => $this->fileRepository->getSysFileReferences($preferredFileObject)
+                    ];
+                }
+            }
+        }
         // Get concerning file duplications
-        if ($preferredFileUid && $sha1 && $this->storage) {
+        if ($preferredFileObject && $sha1 && $this->storage) {
             $fileDuplications = $this->fileRepository->getFileDuplications($this->storage, $this->currentPathSelected, $sha1);
             // Remove preferred file from stack
             if (!empty($fileDuplications)) {
-                unset($fileDuplications[$preferredFileUid]);
+                unset($fileDuplications[$preferredFileObject->getUid()]);
                 // Replace each duplicated file with preferred file in sys_file_reference
                 if (!empty($fileDuplications)) {
                     $replacedFilesTargetPath = $this->appendSlashIfMissing($this->extensionConfigurationBackupPath . $executionTime);
-                    $mkdir = GeneralUtility::mkdir_deep($this->getPathAbsolute($replacedFilesTargetPath, true));
-                    if ($mkdir !== false) {
-                        $replacedFiles = [];
-                        foreach ($fileDuplications as $fileUid => $duplicat) {
-                            if ($duplicat['fileObject'] instanceof File) {
-                                /** @var File $fileObject */
-                                $fileObject = $duplicat['fileObject'];
-                                $replacedFiles[$fileObject->getUid()]['fileFacade'] = new FileFacade($fileObject);
-                                $replacedFiles[$fileObject->getUid()]['sourcePath'] = $this->getPathRelative($this->currentPathRoot . $fileObject->getIdentifier());
-                                $replacedFiles[$fileObject->getUid()]['targetPath'] = $this->getPathRelative($replacedFilesTargetPath . $fileObject->getUid() . '__' . $fileObject->getName());
-                                if (intval($duplicat['references']) > 0) {
-                                    // Get file references
-                                    $sysFileReferences = $this->fileRepository->getSysFileReferences($fileObject);
-                                    // Update file reference
-                                    if (!empty($sysFileReferences)) {
-                                        $replacedFiles[$fileObject->getUid()]['sysFileReferences'] = [];
-                                        $replacedFileReferences = [];
-                                        foreach ($sysFileReferences as $key => $sysFileReference) {
-                                            // Replace uid_local with uid of preferred file uid
-                                            $updateSysFileReferenceFieldsArray = ['uid_local' => $preferredFileUid];
-                                            $updateSysFileReferenceResult = $this->fileRepository->updateSysFileReference(intval($sysFileReference['uid']), $updateSysFileReferenceFieldsArray, true);
-                                            if ($updateSysFileReferenceResult) {
-                                                $replacedFileReferences[$sysFileReference['uid']] = $sysFileReference;
-                                                $replacedFiles[$fileObject->getUid()]['sysFileReferences'][$sysFileReference['uid']] = [$sysFileReference['uid']];
-                                            }
+                    GeneralUtility::mkdir_deep($this->getPathAbsolute($replacedFilesTargetPath, true));
+                    $replacedFiles = [];
+                    foreach ($fileDuplications as $fileUid => $duplicat) {
+                        if ($duplicat['fileObject'] instanceof File) {
+                            /** @var File $fileObject */
+                            $fileObject = $duplicat['fileObject'];
+                            $replacedFiles[$fileObject->getUid()]['fileFacade'] = new FileFacade($fileObject);
+                            $replacedFiles[$fileObject->getUid()]['sourcePath'] = $this->getPathRelative($this->currentPathRoot . $fileObject->getIdentifier());
+                            $replacedFiles[$fileObject->getUid()]['targetPath'] = $this->getPathRelative($replacedFilesTargetPath . $preferredFileObject->getUid() . '__' . $fileObject->getUid() . '__' . $fileObject->getName());
+                            if (intval($duplicat['fileReferences']) > 0) {
+                                // Get file references
+                                $sysFileReferences = $this->fileRepository->getSysFileReferences($fileObject);
+                                // Update file reference
+                                if (!empty($sysFileReferences)) {
+                                    $replacedFiles[$fileObject->getUid()]['sysFileReferences'] = [];
+                                    foreach ($sysFileReferences as $key => $fileReference) {
+                                        // Replace uid_local with uid of preferred file uid
+                                        $updateSysFileReferenceFieldsArray = ['uid_local' => $preferredFileObject->getUid()];
+                                        $updateSysFileReferenceResult = $this->fileRepository->updateSysFileReference(intval($fileReference['uid']), $updateSysFileReferenceFieldsArray, true);
+                                        if ($updateSysFileReferenceResult) {
+                                            $replacedFiles[$fileObject->getUid()]['fileReferences'][$fileReference['uid']] = [$fileReference['uid']];
                                         }
                                     }
                                 }
-                                // Remove file from file system
-                                $movingResult = $this->updateUtility->moveFile(
-                                    $this->getPathAbsolute($replacedFiles[$fileObject->getUid()]['sourcePath'], false),
-                                    $this->getPathAbsolute($replacedFiles[$fileObject->getUid()]['targetPath'], true)
-                                );
-                                // Set file as missing in sys_file
-                                $updateSysFileFieldsArray = ['missing' => 1];
-                                $updateSysFileResult = $this->fileRepository->updateSysFile($fileObject->getUid(), $updateSysFileFieldsArray, true);
                             }
+                            // Remove file from file system
+                            $movingResult = $this->updateUtility->moveFile(
+                                $this->getPathAbsolute($replacedFiles[$fileObject->getUid()]['sourcePath'], false),
+                                $this->getPathAbsolute($replacedFiles[$fileObject->getUid()]['targetPath'], true)
+                            );
+                            // Set file as missing in sys_file
+                            $updateSysFileFieldsArray = ['missing' => 1];
+                            $updateSysFileResult = $this->fileRepository->updateSysFile($fileObject->getUid(), $updateSysFileFieldsArray, true);
                         }
-                        // Log
-                        $this->log(
-                            [
-                                'controller' => __CLASS__,
-                                'action' => __FUNCTION__,
-                                'currentPathRoot' => $this->currentPathRoot,
-                                'preferredFileUid' => $preferredFileUid,
-                                'replacedFiles' => serialize($replacedFiles),
-                                'replacedFilesTargetPath' => $replacedFilesTargetPath,
-                                'replacedFileReferences' => [],
-                                'storage' => $this->storage,
-                            ],
-                            $this->getPathAbsolute($replacedFilesTargetPath, true) . '_' . __FUNCTION__ . '.log'
-                        );
                     }
+                    // Log
+                    $this->log(
+                        [
+                            'controller' => __CLASS__,
+                            'action' => __FUNCTION__,
+                            'currentPathRoot' => $this->currentPathRoot,
+                            'preferredFile' => $preferredFileObject,
+                            'replacedFiles' => serialize($replacedFiles),
+                            'replacedFilesTargetPath' => $replacedFilesTargetPath,
+                            'storage' => $this->storage,
+                        ],
+                        $this->getPathAbsolute($replacedFilesTargetPath, true) . '_' . __FUNCTION__ . '.log'
+                    );
                 }
             }
         }
@@ -168,7 +170,6 @@ class FileDuplicationController extends AbstractFileController
         $this->view->assign('data', $this->data);
         $this->view->assign('preferredFile', $preferredFile);
         $this->view->assign('replacedFiles', $replacedFiles);
-        $this->view->assign('replacedFileReferences', $replacedFileReferences);
         $this->view->assign('executionTime', $executionTime);
         $this->view->assign('replacedFilesTargetPath', $replacedFilesTargetPath);
     }
@@ -201,7 +202,7 @@ class FileDuplicationController extends AbstractFileController
                         'action' => $logMessageArray['action'],
                         'storageUid' => $logMessageArray['storage']->getUid(),
                         'currentPathRoot' => $logMessageArray['currentPathRoot'],
-                        'preferredFileUid' => $logMessageArray['preferredFileUid']
+                        'preferredFileUid' => $logMessageArray['preferredFile']->getUid()
                     ]),
                     $type
                 );

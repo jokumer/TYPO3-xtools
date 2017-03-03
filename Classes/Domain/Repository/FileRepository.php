@@ -83,6 +83,7 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
     /**
      * Get file duplications
      * Returns array of all found sys_file's, which has given sha1 value
+     * Doesnt matter, if they have file references or not
      *
      * @param ResourceStorage $storageUid
      * @param string $directory
@@ -120,7 +121,7 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
                         try {
                             $fileObject = $this->factory->getFileObject($row['uid']);
                             $fileDuplications[$key]['fileObject'] = $fileObject;
-                            $fileDuplications[$key]['references'] = $this->getSysFileReferences($fileObject);
+                            $fileDuplications[$key]['fileReferences'] = $this->getSysFileReferences($fileObject);
                         } catch (ResourceDoesNotExistException $exception) {
                             // No handling, just omit the invalid reference uid
                         }
@@ -166,6 +167,7 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
     public function getSysFileReferences(File $file, $limit = 10000) {
         $fileReferences = null;
         if ($file instanceof File) {
+            $addWhereArray['notDeleted'] = 'deleted = 0';
             $addWhereArray['sysFile'] = 'uid_local = ' . $file->getUid();
             $addWhere = ' AND ' . implode(' AND ', $addWhereArray);
             $rows = $this->getDatabaseConnection()->exec_SELECTgetRows(

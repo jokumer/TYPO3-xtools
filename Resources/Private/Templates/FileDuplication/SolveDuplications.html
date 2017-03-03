@@ -37,19 +37,19 @@
 				<tbody>
 					<tr class="odd" role="row">
 						<td style="white-space: nowrap">
-							<fl:link.clickMenuOnIcon table="{preferredFile.combinedIdentifier}">
-								{preferredFile.icon->f:format.raw()} {preferredFile.uid}
+							<fl:link.clickMenuOnIcon table="{preferredFile.fileFacade.combinedIdentifier}">
+								{preferredFile.fileFacade.icon->f:format.raw()} {preferredFile.fileFacade.uid}
 							</fl:link.clickMenuOnIcon>
 						</td>
 						<td>
-							<f:if condition="{preferredFile.publicUrl}">
+							<f:if condition="{preferredFile.fileFacade.publicUrl}">
 								<f:then>
-									<a href="/{preferredFile.publicUrl}"
+									<a href="/{preferredFile.fileFacade.publicUrl}"
 									   target="_blank"
-									   title="{preferredFile.publicUrl}">
-										<f:if condition="{preferredFile.type} == 2">
-											<f:image image="{preferredFile.resource}"
-													 alt="{preferredFile.name}"
+									   title="{preferredFile.fileFacade.publicUrl}">
+										<f:if condition="{preferredFile.fileFacade.type} == 2">
+											<f:image image="{preferredFile.fileFacade.resource}"
+													 alt="{preferredFile.fileFacade.name}"
 													 treatIdAsReference="0"
 													 maxWidth="64"
 													 maxHeight="64"
@@ -58,62 +58,64 @@
 									</a>
 								</f:then>
 								<f:else>
-									<span title="{preferredFile.publicUrl}">
+									<span title="{preferredFile.fileFacade.publicUrl}">
 										NOT FOUND
 									</span>
 								</f:else>
 							</f:if>
 						</td>
 						<td>
-							<f:if condition="{preferredFile.publicUrl}">
+							<f:if condition="{preferredFile.fileFacade.publicUrl}">
 								<f:then>
-									<a href="/{preferredFile.publicUrl}"
+									<a href="/{preferredFile.fileFacade.publicUrl}"
 									   target="_blank"
-									   title="{preferredFile.publicUrl}">
-									{preferredFile.name}
+									   title="{preferredFile.fileFacade.publicUrl}">
+									{preferredFile.fileFacade.name}
 									</a>
 								</f:then>
 								<f:else>
-									<span title="{preferredFile.publicUrl}">
-										{preferredFile.name} NOT FOUND
+									<span title="{preferredFile.fileFacade.publicUrl}">
+										{preferredFile.fileFacade.name} NOT FOUND
 									</span>
 								</f:else>
 							</f:if>
 						</td>
 						<td>
-							<f:if condition="{f:count(subject:'{preferredFile.references}')}">
+							<f:if condition="{f:count(subject:'{preferredFile.fileReferences}')}">
 								<f:then>
-									<f:count subject="{preferredFile.references}"/>
+									<span title="SELECT uid, uid_local, uid_foreign, tablenames, fieldname, table_local FROM sys_file_reference WHERE uid IN ({f:if(condition:'{iteration.isLast}', then:'{fileReference.uid}', else:'{fileReference.uid},') -> f:for(each:'{preferredFile.fileReferences}', as:'fileReference', iteration:'iteration')})">
+										<f:count subject="{preferredFile.fileReferences}"/>
+									</span>
 								</f:then>
 								<f:else>
-									<span title="unknown">?</span>
+									-
 								</f:else>
 							</f:if>
 						</td>
 						<td>
-							<b>Title</b>:&nbsp;{preferredFile.properties.title}<br/>
-							<b>Description</b>:&nbsp;{preferredFile.properties.description}<br/>
-							<b>Keywords</b>:&nbsp;{preferredFile.properties.keywords}<br/>
-							<b>Caption</b>:&nbsp;{preferredFile.properties.caption}<br/>
+							<b>Title</b>:&nbsp;{preferredFile.fileFacade.properties.title}<br/>
+							<b>Description</b>:&nbsp;{preferredFile.fileFacade.properties.description}<br/>
+							<b>Keywords</b>:&nbsp;{preferredFile.fileFacade.properties.keywords}<br/>
+							<b>Caption</b>:&nbsp;{preferredFile.fileFacade.properties.caption}<br/>
 						</td>
 						<td>
 							<f:format.date format="Y.m.d. H:i">
-								{preferredFile.properties.creation_date}
+								{preferredFile.fileFacade.properties.creation_date}
 							</f:format.date> <em>File</em><br/>
 							<f:format.date format="Y.m.d. H:i">
-								{preferredFile.properties.modification_date}
+								{preferredFile.fileFacade.properties.modification_date}
 							</f:format.date> <em>File</em><br/>
 							<f:format.date format="Y.m.d. H:i">
-								{preferredFile.properties.crdate}
+								{preferredFile.fileFacade.properties.crdate}
 							</f:format.date> <em>DB</em><br/>
 							<f:format.date format="Y.m.d. H:i">
-								{preferredFile.properties.tstamp}
+								{preferredFile.fileFacade.properties.tstamp}
 							</f:format.date> <em>DB</em><br/>
 						</td>
 						<td>
-							<f:if condition="{preferredFile.publicUrl}">
+							<f:if condition="{preferredFile.fileFacade.publicUrl}">
 								<f:then>
-									{preferredFile.publicUrl}
+									{preferredFile.fileFacade.publicUrl}
 								</f:then>
 								<f:else>
 									NOT FOUND
@@ -127,7 +129,8 @@
 				<f:then>
 					<h4>Replaced files:</h4>
 					<p>
-						Files has been moved to {replacedFilesTargetPath} prepended with file uid. A log file with all kind of informations belongs in this folder.
+						Files has been moved to {replacedFilesTargetPath}. A log file with all kind of informations belongs in this folder.<br/>
+						Filenames are prepended with preferred file uid and '__' this file uid '__'.
 					</p>
 					<table class="t3-table t3-datatable">
 						<thead>
@@ -148,10 +151,10 @@
 										<b>To</b>: {replacedFile.targetPath}
 									</td>
 									<td>
-										<f:if condition="{replacedFile.sysFileReferences}">
+										<f:if condition="{replacedFile.fileReferences}">
 											<f:then>
-												<f:for each="{replacedFile.sysFileReferences}" as="reference" key="referenceUid" iteration="iteration">
-													{f:if(condition:'{iteration.isLast}', then:'{referenceUid}', else:'{referenceUid},')}
+												<f:for each="{replacedFile.fileReferences}" as="fileReference" key="fileReferenceUid" iteration="iteration">
+													{f:if(condition:'{iteration.isLast}', then:'{fileReferenceUid}', else:'{fileReferenceUid},')}
 												</f:for>
 											</f:then>
 											<f:else>

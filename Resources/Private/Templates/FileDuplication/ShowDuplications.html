@@ -150,10 +150,10 @@
 						</f:if>
 					</td>
 					<td>
-						<f:if condition="{f:count(subject:'{fileDuplication.references}')}">
+						<f:if condition="{f:count(subject:'{fileDuplication.fileReferences}')}">
 							<f:then>
-								<span title="SELECT uid, uid_local, uid_foreign, tablenames, fieldname, table_local FROM sys_file_reference WHERE uid IN ({f:if(condition:'{iteration.isLast}', then:'{reference.uid}', else:'{reference.uid},') -> f:for(each:'{fileDuplication.references}', as:'reference', iteration:'iteration')})">
-									<f:count subject="{fileDuplication.references}"/>
+								<span title="SELECT uid, uid_local, uid_foreign, tablenames, fieldname, table_local FROM sys_file_reference WHERE uid IN ({f:if(condition:'{iteration.isLast}', then:'{fileReference.uid}', else:'{fileReference.uid},') -> f:for(each:'{fileDuplication.fileReferences}', as:'fileReference', iteration:'iteration')})">
+									<f:count subject="{fileDuplication.fileReferences}"/>
 								</span>
 							</f:then>
 							<f:else>
