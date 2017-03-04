@@ -147,7 +147,7 @@
 										{replacedFile.fileFacade.icon->f:format.raw()} {replacedFile.fileFacade.uid}
 									</td>
 									<td class="{f:if(condition: replacedFile.fileNotFound, then: 'alert-warning', else: '')}">
-										<f:if condition="replacedFile.fileNotFound">
+										<f:if condition="{replacedFile.fileNotFound}">
 											<f:then>
 												<b>File not found, could not move file. References updated nevertheless.</b>
 											</f:then>

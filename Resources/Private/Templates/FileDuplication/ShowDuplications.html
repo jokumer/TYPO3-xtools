@@ -24,11 +24,8 @@
 				<f:if condition="{data.selection.path}">
 					Directory: {data.selection.path}<br/>
 				</f:if>
-				Files sha1: {fileDuplications.0.fileFacade.sha1}<br/>
+				Files sha1: {data.selection.sha1}<br/>
 				Files count: <f:count subject="{fileDuplications}"/><br/>
-				<f:comment>(fileDuplications.0.fileFacade.size) already in Ki</f:comment>
-				File size: <f:format.bytes>{f:cObject(typoscriptObjectPath:'lib.tx_xtools.math', data:'{fileDuplications.0.fileFacade.size}*1024')}</f:format.bytes><br/>
-				Reduction: <f:format.bytes>{f:cObject(typoscriptObjectPath:'lib.tx_xtools.math', data:'({f:count(subject:\'{fileDuplications}\')}-1)*{fileDuplications.0.fileFacade.size}*1024')}</f:format.bytes>
 			</p>
 			<f:if condition="{f:count(subject:'{fileDuplications}')} > {extensionConfiguration.pagination_itemsPerPage}">
 				<f:then>
@@ -62,7 +59,9 @@
 
 <f:section name="list">
 	<p>Select preferred file and submit below, to replace file duplications and adapt their references. Ensure duplicated files are not used in any links!</p>
-	<f:form action="solveDuplications" controller="FileDuplication">
+	<f:form id="tx_xtools_form_action_solve-duplications"
+			action="solveDuplications"
+			controller="FileDuplication" >
 		<f:form.hidden name="selection[sha1]" value="{data.selection.sha1}"/>
 		<f:form.hidden name="selection[storage]" value="{data.selection.storage.uid}"/>
 		<f:form.hidden name="selection[path]" value="{data.selection.path}"/>
@@ -130,8 +129,11 @@
 						</f:if>
 					</td>
 					<td class="{f:if(condition: fileDuplication.exists, then: '', else: 'alert-warning')}">
-						<f:if condition="replacedFile.fileNotFound">
-							<b>File not found</b>
+						<f:if condition="{fileDuplication.exists}">
+							<f:then></f:then>
+							<f:else>
+								<b>File not found</b>
+							</f:else>
 						</f:if>
 						<f:if condition="{fileDuplication.fileFacade.publicUrl}">
 							<f:then>
@@ -179,8 +181,11 @@
 						</f:format.date> <em>DB</em><br/>
 					</td>
 					<td class="{f:if(condition: fileDuplication.exists, then: '', else: 'alert-warning')}">
-						<f:if condition="replacedFile.fileNotFound">
-							<b>File not found</b>
+						<f:if condition="{fileDuplication.exists}">
+							<f:then></f:then>
+							<f:else>
+								<b>File not found</b>
+							</f:else>
 						</f:if>
 						<f:if condition="{fileDuplication.fileFacade.publicUrl}">
 							<f:then>

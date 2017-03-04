@@ -192,7 +192,9 @@ class FileDuplicationController extends AbstractFileController
         $persistenceManager = $this->objectManager->get(\TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager::class);
         // Assign persited preferred file
         $persistenceManager->persistAll();
-        $preferredFile['fileReferences'] = $this->fileRepository->getSysFileReferences($preferredFileObject);
+        if ($preferredFileObject instanceof File) {
+            $preferredFile['fileReferences'] = $this->fileRepository->getSysFileReferences($preferredFileObject);
+        }
         $this->view->assign('preferredFile', $preferredFile);
     }
 
