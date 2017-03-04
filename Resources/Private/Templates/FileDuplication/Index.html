@@ -71,6 +71,16 @@
 					<f:render section="list_filesDuplication" arguments="{results:filesDuplications, data:data}"/>
 				</f:else>
 			</f:if>
+			<f:form action="index" controller="FileDuplication">
+				<p>
+					<f:form.hidden name="selection[storage]" value="{data.selection.storage.uid}"/>
+					<f:form.hidden name="selection[path]" value="{data.selection.path}"/>
+					<f:form.textfield name="sha1" placeholder="sha1" value=""/>
+					<f:form.submit id="tx_xtools_btn_replace"
+								   value="Filter"
+								   class="btn btn-sm btn-success" />
+				</p>
+			</f:form>
 		</f:then>
 		<f:else>
 			No duplications found!

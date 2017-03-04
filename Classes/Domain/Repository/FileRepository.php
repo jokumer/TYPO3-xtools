@@ -50,16 +50,20 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
      *
      * @param ResourceStorage $storageUid
      * @param string $directory
+     * @param string $sha1
      * @param integer $limit
      * @return QueryResultInterface
      */
-    public function getFilesDuplications($storage = null, $directory = null, $limit = 10000) {
+    public function getFilesDuplications($storage = null, $directory = null, $sha1 = null, $limit = 10000) {
         $filesDuplications = null;
         if ($storage instanceof ResourceStorage) {
             $addWhereArray['storage'] = 'storage = ' . $storage->getUid();
             if ($directory !== null) {
                 $directorySearchPhrase = ($directory === '') ? '\/' : '\/' . $directory . '\/';
                 $addWhereArray['identifier'] = 'identifier LIKE \'' . $directorySearchPhrase . '%\'';
+            }
+            if ($sha1 !== null) {
+                $addWhereArray['sha1'] = 'sha1 = ' . $this->getDatabaseConnection()->fullQuoteStr($sha1, 'sys_file');
             }
             $addWhereArray['excludeProcessedFiles'] = '(identifier NOT LIKE \'%/_processed_/%\' AND pid = 0)';
             $addWhereArray['missing'] = '(missing = 0)';
@@ -91,24 +95,25 @@ class FileRepository extends \TYPO3\CMS\Core\Resource\FileRepository
      * @param integer $limit
      * @return QueryResultInterface
      */
-    public function getFileDuplications($storage = null, $directory = null, $sha1 = '', $limit = 10000) {
+    public function getFileDuplications($storage = null, $directory = null, $sha1 = null, $limit = 10000) {
         $fileDuplications = null;
         if ($storage instanceof ResourceStorage) {
-            $addWhereArray['storage'] = 'sf.storage = ' . $storage->getUid();
-            if ($directory !== null) {
-                $directorySearchPhrase = ($directory === '') ? '\/' : '\/' . $directory . '\/';
-                $addWhereArray['identifier'] = 'identifier LIKE \'' . $directorySearchPhrase . '%\'';
-            }
-            $addWhereArray['excludeProcessedFiles'] = '(sf.identifier NOT LIKE \'%/_processed_/%\' AND sf.pid = 0)';
-            $addWhereArray['missing'] = '(sf.missing = 0)';
-            $addWhere = ' AND ' . implode(' AND ', $addWhereArray);
-            if ($sha1) {
+            if ($sha1 !== null) {
+                $addWhereArray['storage'] = 'sf.storage = ' . $storage->getUid();
+                if ($directory !== null) {
+                    $directorySearchPhrase = ($directory === '') ? '\/' : '\/' . $directory . '\/';
+                    $addWhereArray['identifier'] = 'sf.identifier LIKE \'' . $directorySearchPhrase . '%\'';
+                }
+                $addWhereArray['sha1'] = 'sf.sha1 = ' . $this->getDatabaseConnection()->fullQuoteStr($sha1, 'sys_file');
+                $addWhereArray['excludeProcessedFiles'] = '(sf.identifier NOT LIKE \'%/_processed_/%\' AND sf.pid = 0)';
+                $addWhereArray['missing'] = '(sf.missing = 0)';
+                $addWhere = ' AND ' . implode(' AND ', $addWhereArray);
                 $rows = $this->getDatabaseConnection()->exec_SELECTgetRows(
                     'sf.uid, sf.sha1, sf.name, count(sf.uid) sfrCount',
                     'sys_file AS sf'
                     . ' LEFT JOIN sys_file_reference AS sfr ON sf.uid = sfr.uid_local'
                     . ' LEFT JOIN sys_file_metadata AS sfm ON sf.uid = sfm.file',
-                    'sf.sha1 = ' . $this->getDatabaseConnection()->fullQuoteStr($sha1, 'sys_file') . $addWhere,
+                    '1=1' . $addWhere,
                     'sf.uid',
                     // @todo: Advanced order by meta (title, description, caption, keyword..) using case if then ...
                     'sfrCount DESC, sf.name ASC, sfm.title DESC, sfm.description DESC, sfm.caption DESC, sfm.keywords DESC',

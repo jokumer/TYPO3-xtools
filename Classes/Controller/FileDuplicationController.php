@@ -46,8 +46,13 @@ class FileDuplicationController extends AbstractFileController
     {
         // Assign data
         $this->view->assign('data', $this->data);
+        if ($this->request->hasArgument('sha1')) {
+            $sha1 = $this->request->getArgument('sha1');
+        } else {
+            $sha1 = null;
+        }
         // Assign files duplications
-        $filesDuplications = $this->fileRepository->getFilesDuplications($this->storage, $this->currentPathSelected);
+        $filesDuplications = $this->fileRepository->getFilesDuplications($this->storage, $this->currentPathSelected, $sha1);
         $this->view->assign('filesDuplications', $filesDuplications);
     }
 
