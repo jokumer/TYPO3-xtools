@@ -755,7 +755,7 @@ class UpdateUtility
     public function logMessage($message = null, $type = 4, $action = 0, $error = 0, $details_nr = 0, array $data = null) {
         if ($message !== null) {
             // $GLOBALS['BE_USER']->simplelog($message, 'tx_xtools', $type);
-            $GLOBALS['BE_USER']->writelog($type, $action, $error, $details_nr, 'tx_xtools' . $message, $data);
+            $GLOBALS['BE_USER']->writelog($type, $action, $error, $details_nr, 'EXT:tx_xtools ' . $message, $data);
         }
     }
 }

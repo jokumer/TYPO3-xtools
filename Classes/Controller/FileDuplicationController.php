@@ -156,9 +156,9 @@ class FileDuplicationController extends AbstractFileController
                             'action' => __FUNCTION__,
                             'currentPathRoot' => $this->currentPathRoot,
                             'preferredFile' => $preferredFileObject,
-                            'replacedFiles' => serialize($replacedFiles),
+                            'replacedFiles' => $replacedFiles,
                             'replacedFilesTargetPath' => $replacedFilesTargetPath,
-                            'storage' => $this->storage,
+                            'storage' => $this->storage->getUid(),
                         ],
                         $this->getPathAbsolute($replacedFilesTargetPath, true) . '_' . __FUNCTION__ . '.log'
                     );
@@ -203,7 +203,7 @@ class FileDuplicationController extends AbstractFileController
                     serialize([
                         'controller' => $logMessageArray['controller'],
                         'action' => $logMessageArray['action'],
-                        'storageUid' => $logMessageArray['storage']->getUid(),
+                        'storageUid' => $logMessageArray['storage'],
                         'currentPathRoot' => $logMessageArray['currentPathRoot'],
                         'preferredFileUid' => $logMessageArray['preferredFile']->getUid()
                     ]),
