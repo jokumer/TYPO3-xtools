@@ -147,8 +147,28 @@
 										{replacedFile.fileFacade.icon->f:format.raw()} {replacedFile.fileFacade.uid}
 									</td>
 									<td>
-										<b>From</b>: {replacedFile.sourcePath}<br/>
-										<b>To</b>: {replacedFile.targetPath}
+										<f:if condition="{replacedFile.realFileDuplication}">
+											<f:then>
+												<span style="color: red">
+													<b>File was real duplicate in file system</b><br/>
+													<b>From</b>: {replacedFile.sourcePath}
+												</span>
+											</f:then>
+											<f:else>
+												<f:if condition="{replacedFile.isAffectedForControlCharacter}">
+													<f:then>
+														<span style="color: red">
+															<b>Wrong file (contains wrong chars)</b><br/>
+															<b>From</b>: {replacedFile.sourcePath}
+														</span>
+													</f:then>
+													<f:else>
+														<b>From</b>: {replacedFile.sourcePath}<br/>
+														<b>To</b>: {replacedFile.targetPath}
+													</f:else>
+												</f:if>
+											</f:else>
+										</f:if>
 									</td>
 									<td>
 										<f:if condition="{replacedFile.fileReferences}">

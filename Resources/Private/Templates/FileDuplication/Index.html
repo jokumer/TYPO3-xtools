@@ -73,12 +73,19 @@
 			</f:if>
 			<f:form action="index" controller="FileDuplication">
 				<p>
+					Filter list by sha1 (exact match!)
+				</p>
+				<p>
 					<f:form.hidden name="selection[storage]" value="{data.selection.storage.uid}"/>
 					<f:form.hidden name="selection[path]" value="{data.selection.path}"/>
-					<f:form.textfield name="sha1" placeholder="sha1" value=""/>
-					<f:form.submit id="tx_xtools_btn_replace"
-								   value="Filter"
-								   class="btn btn-sm btn-success" />
+					<div class="input-group">
+						<f:form.textfield name="sha1" placeholder="sha1" value="" class="form-control"/>
+						<span class="input-group-btn">
+							<f:form.submit id="tx_xtools_btn_replace"
+										   value="Filter"
+										   class="btn btn-info" />
+						</span>
+					</div>
 				</p>
 			</f:form>
 		</f:then>

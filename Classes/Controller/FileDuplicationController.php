@@ -73,9 +73,29 @@ class FileDuplicationController extends AbstractFileController
                 // Assign fileDuplicationsArray use FileFacade, add references count
                 $count = 0;
                 $fileDuplicationsArray = [];
-                foreach ($fileDuplications as $key => $fileDuplication) {
+                $fileDuplicationsIdentifierForComparisonCheckArray = [];
+                foreach ($fileDuplications as $fileDuplication) {
                     $fileDuplicationsArray[$count]['fileFacade'] = new FileFacade($fileDuplication['fileObject']);
                     $fileDuplicationsArray[$count]['fileReferences'] = $fileDuplication['fileReferences'];
+                    $fileDuplicationPathAbsolute = $this->getPathAbsolute($this->currentPathRoot . $fileDuplication['fileObject']->getIdentifier());
+                    if (file_exists($fileDuplicationPathAbsolute)) {
+                        $fileDuplicationsArray[$count]['exists'] = true;
+                        // Check indentifier ('B%C3%A5dev%C3%A6rft.jpg' !== 'Ba%CC%8Adev%C3%A6rft.jpg')
+                        $isAffectedForControlCharacter = $this->updateUtility->verifyFileNameIsAffectedForControlCharacter($fileDuplication['fileObject']->getIdentifier());
+                        if ($isAffectedForControlCharacter) {
+                            $fileDuplicationsArray[$count]['isAffectedForControlCharacter'] = true;
+                        }
+                        // Register, if file object is a real duplication in file system
+                        if (false !== $key = array_search($fileDuplication['fileObject']->getIdentifier(), $fileDuplicationsIdentifierForComparisonCheckArray)) {
+                            $fileDuplicationsArray[$count]['realFileDuplication'] = true;
+                            $fileDuplicationsArray[$key]['realFileDuplication'] = true;
+                        } else {
+                            $fileDuplicationsArray[$count]['realFileDuplication'] = false;
+                        }
+                        $fileDuplicationsIdentifierForComparisonCheckArray[$count] = $fileDuplication['fileObject']->getIdentifier();
+                    } else {
+                        $fileDuplicationsArray[$count]['exists'] = false;
+                    }
                     $count++;
                 }
                 $this->view->assign('fileDuplications', $fileDuplicationsArray);
@@ -121,13 +141,13 @@ class FileDuplicationController extends AbstractFileController
                     $replacedFilesTargetPath = $this->appendSlashIfMissing($this->extensionConfigurationBackupPath . $executionTime);
                     GeneralUtility::mkdir_deep($this->getPathAbsolute($replacedFilesTargetPath, true));
                     $replacedFiles = [];
+                    $replacedFilesIdentifierForComparisonCheckArray = [];
                     foreach ($fileDuplications as $fileUid => $duplicat) {
                         if ($duplicat['fileObject'] instanceof File) {
                             /** @var File $fileObject */
                             $fileObject = $duplicat['fileObject'];
                             $replacedFiles[$fileObject->getUid()]['fileFacade'] = new FileFacade($fileObject);
-                            $replacedFiles[$fileObject->getUid()]['sourcePath'] = $this->getPathRelative($this->currentPathRoot . $fileObject->getIdentifier());
-                            $replacedFiles[$fileObject->getUid()]['targetPath'] = $this->getPathRelative($replacedFilesTargetPath . $preferredFileObject->getUid() . '__' . $fileObject->getUid() . '__' . $fileObject->getName());
+                            // Change file references
                             if (intval($duplicat['fileReferences']) > 0) {
                                 // Get file references
                                 $sysFileReferences = $this->fileRepository->getSysFileReferences($fileObject);
@@ -145,10 +165,27 @@ class FileDuplicationController extends AbstractFileController
                                 }
                             }
                             // Remove file from file system
-                            $movingResult = $this->updateUtility->moveFile(
-                                $this->getPathAbsolute($replacedFiles[$fileObject->getUid()]['sourcePath'], false),
-                                $this->getPathAbsolute($replacedFiles[$fileObject->getUid()]['targetPath'], true)
-                            );
+                            $replacedFiles[$fileObject->getUid()]['sourcePath'] = $this->getPathRelative($this->currentPathRoot . $fileObject->getIdentifier());
+                            $replacedFiles[$fileObject->getUid()]['targetPath'] = $this->getPathRelative($replacedFilesTargetPath . $preferredFileObject->getUid() . '__' . $fileObject->getUid() . '__' . $fileObject->getName());
+                            // Avoid replaced file replaces preferred, if duplicated in db sys_file
+                            if ($preferredFileObject->getIdentifier() !== $fileObject->getIdentifier()) {
+                                // Check indentifier ('B%C3%A5dev%C3%A6rft.jpg' !== 'Ba%CC%8Adev%C3%A6rft.jpg'), if wrong spelled it could remove preffered file too
+                                $isAffectedForControlCharacter = $this->updateUtility->verifyFileNameIsAffectedForControlCharacter($fileObject->getIdentifier());
+                                if (!$isAffectedForControlCharacter) {
+                                    if (false === $key = array_search($fileObject->getIdentifier(), $replacedFilesIdentifierForComparisonCheckArray)) {
+                                        $movingResult = $this->updateUtility->moveFile(
+                                            $this->getPathAbsolute($replacedFiles[$fileObject->getUid()]['sourcePath'], false),
+                                            $this->getPathAbsolute($replacedFiles[$fileObject->getUid()]['targetPath'], true)
+                                        );
+                                    }
+                                    // Register, if file object is not a real duplication in file system
+                                    $replacedFilesIdentifierForComparisonCheckArray[] = $fileObject->getIdentifier();
+                                } else {
+                                    $replacedFiles[$fileObject->getUid()]['isAffectedForControlCharacter'] = true;
+                                }
+                            } else {
+                                $replacedFiles[$fileObject->getUid()]['realFileDuplication'] = true;
+                            }
                             // Set file as missing in sys_file
                             $updateSysFileFieldsArray = ['missing' => 1];
                             $updateSysFileResult = $this->fileRepository->updateSysFile($fileObject->getUid(), $updateSysFileFieldsArray, true);
