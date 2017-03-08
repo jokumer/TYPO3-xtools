@@ -62,7 +62,9 @@
 
 <f:section name="list">
 	<p>Select preferred file and submit below, to replace file duplications and adapt their references. Ensure duplicated files are not used in any links!</p>
-	<f:form action="solveDuplications" controller="FileDuplication">
+	<f:form action="solveDuplications"
+			controller="FileDuplication"
+			id="tx_xtools_form_action_solveduplications">
 		<f:form.hidden name="sha1" value="{results.0.fileFacade.sha1}"/>
 		<f:form.hidden name="selection[storage]" value="{data.selection.storage.uid}"/>
 		<f:form.hidden name="selection[path]" value="{data.selection.path}"/>
