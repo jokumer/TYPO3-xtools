@@ -63,8 +63,6 @@ class FileDuplicationController extends AbstractFileController
      */
     public function showDuplicationsAction()
     {
-        // Assign data
-        $this->view->assign('data', $this->data);
         // Assign file duplications
         if ($this->request->hasArgument('sha1')) {
             $sha1 = $this->request->getArgument('sha1');
@@ -74,6 +72,7 @@ class FileDuplicationController extends AbstractFileController
                 $count = 0;
                 $fileDuplicationsArray = [];
                 $fileDuplicationsIdentifierForComparisonCheckArray = [];
+                $fileDuplicationsAreAffectedForControlCharacter = [];
                 foreach ($fileDuplications as $fileDuplication) {
                     $fileDuplicationsArray[$count]['fileFacade'] = new FileFacade($fileDuplication['fileObject']);
                     $fileDuplicationsArray[$count]['fileReferences'] = $fileDuplication['fileReferences'];
@@ -84,6 +83,7 @@ class FileDuplicationController extends AbstractFileController
                         $isAffectedForControlCharacter = $this->updateUtility->verifyFileNameIsAffectedForControlCharacter($fileDuplication['fileObject']->getIdentifier());
                         if ($isAffectedForControlCharacter) {
                             $fileDuplicationsArray[$count]['isAffectedForControlCharacter'] = true;
+                            $fileDuplicationsAreAffectedForControlCharacter[] = $fileDuplication['fileObject']->getUid();
                         }
                         // Register, if file object is a real duplication in file system
                         if (false !== $key = array_search($fileDuplication['fileObject']->getIdentifier(), $fileDuplicationsIdentifierForComparisonCheckArray)) {
@@ -99,8 +99,11 @@ class FileDuplicationController extends AbstractFileController
                     $count++;
                 }
                 $this->view->assign('fileDuplications', $fileDuplicationsArray);
+                $this->data['fileDuplicationsAreAffectedForControlCharacter'] = $fileDuplicationsAreAffectedForControlCharacter;
             }
         }
+        // Assign data
+        $this->view->assign('data', $this->data);
     }
 
     /**
@@ -142,6 +145,7 @@ class FileDuplicationController extends AbstractFileController
                     GeneralUtility::mkdir_deep($this->getPathAbsolute($replacedFilesTargetPath, true));
                     $replacedFiles = [];
                     $replacedFilesIdentifierForComparisonCheckArray = [];
+                    $replacedFilesAreAffectedForControlCharacter = [];
                     foreach ($fileDuplications as $fileUid => $duplicat) {
                         if ($duplicat['fileObject'] instanceof File) {
                             /** @var File $fileObject */
@@ -182,6 +186,7 @@ class FileDuplicationController extends AbstractFileController
                                     $replacedFilesIdentifierForComparisonCheckArray[] = $fileObject->getIdentifier();
                                 } else {
                                     $replacedFiles[$fileObject->getUid()]['isAffectedForControlCharacter'] = true;
+                                    $replacedFilesAreAffectedForControlCharacter[] = $fileObject->getUid();
                                 }
                             } else {
                                 $replacedFiles[$fileObject->getUid()]['realFileDuplication'] = true;
@@ -210,13 +215,16 @@ class FileDuplicationController extends AbstractFileController
         // Assign data
         $this->view->assign('data', $this->data);
         $this->view->assign('replacedFiles', $replacedFiles);
+        $this->view->assign('replacedFilesAreAffectedForControlCharacter', $replacedFilesAreAffectedForControlCharacter);
         $this->view->assign('executionTime', $executionTime);
         $this->view->assign('replacedFilesTargetPath', $replacedFilesTargetPath);
         $persistenceManager = $this->objectManager->get(\TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager::class);
         // Assign persited preferred file
         $persistenceManager->persistAll();
-        $preferredFile['fileReferences'] = $this->fileRepository->getSysFileReferences($preferredFileObject);
-        $this->view->assign('preferredFile', $preferredFile);
+        if ($preferredFileObject){
+            $preferredFile['fileReferences'] = $this->fileRepository->getSysFileReferences($preferredFileObject);
+            $this->view->assign('preferredFile', $preferredFile);
+        }
     }
 
     /**

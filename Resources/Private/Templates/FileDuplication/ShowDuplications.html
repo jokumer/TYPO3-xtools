@@ -92,7 +92,26 @@
 					<td>
 						<f:if condition="{fileDuplication.isAffectedForControlCharacter}">
 							<f:then>
-								<!-- Wrong file (contains wrong chars) -->
+								<f:if condition="{f:count(subject:'{data.fileDuplicationsAreAffectedForControlCharacter}')} == {f:count(subject:'{results}')}">
+									<f:then>
+										<f:if condition="{i.isFirst}">
+											<f:then>
+												<f:if condition="{fileDuplication.exists}">
+													<f:form.radio id="preferred-file-selection-{fileDuplication.fileFacade.uid}"
+																  name="preferredFileUid"
+																  value="{fileDuplication.fileFacade.uid}"
+																  additionalAttributes="{checked:'checked'}"/>
+												</f:if>
+											</f:then>
+											<f:else>
+												<!-- no solution yet -->
+											</f:else>
+										</f:if>
+									</f:then>
+									<f:else>
+										<!-- wrong char in file name -->
+									</f:else>
+								</f:if>
 							</f:then>
 							<f:else>
 								<f:if condition="{i.isFirst}">
@@ -224,8 +243,17 @@
 			</f:for>
 			</tbody>
 		</table>
-		<f:form.submit id="tx_xtools_btn_replace"
-					   value="Replace"
-					   class="btn btn-danger" />
+		<f:if condition="{f:count(subject:'{data.fileDuplicationsAreAffectedForControlCharacter}')} == {f:count(subject:'{results}')}">
+			<f:then>
+				<f:form.submit id="tx_xtools_btn_replace"
+							   value="Replace by preferring first file uid:{results.0.fileFacade.uid}"
+							   class="btn btn-danger" />
+			</f:then>
+			<f:else>
+				<f:form.submit id="tx_xtools_btn_replace"
+							   value="Replace firs"
+							   class="btn btn-danger" />
+			</f:else>
+		</f:if>
 	</f:form>
 </f:section>
